@@ -114,9 +114,17 @@ function AppointmentPanel({ apt, onClose, onStatus, onCancel, onReminder }: {
   );
 }
 
+const WA_BADGES: Record<string, { label: string; cls: string }> = {
+  sent: { label: 'WA enviado', cls: 'bg-slate-100 text-slate-600 border-slate-200' },
+  confirmed: { label: 'WA confirmado', cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  cancelled: { label: 'WA cancelado', cls: 'bg-red-50 text-red-700 border-red-200' },
+  reschedule_requested: { label: 'WA reprogramar', cls: 'bg-amber-50 text-amber-800 border-amber-200' },
+};
+
 function AppointmentBlock({ apt, onSelect }: { apt: any; onSelect: () => void }) {
   const color = APPOINTMENT_STATUS_COLORS[apt.status as AppointmentStatus];
   const time = new Date(apt.scheduledAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+  const wa = apt.whatsappStatus ? WA_BADGES[apt.whatsappStatus] : null;
   return (
     <button
       type="button"
@@ -129,7 +137,14 @@ function AppointmentBlock({ apt, onSelect }: { apt: any; onSelect: () => void })
         borderLeftColor: color,
       }}
     >
-      <p className="text-xs font-semibold text-slate-500 tabular-nums">{time}</p>
+      <div className="flex items-center justify-between gap-1">
+        <p className="text-xs font-semibold text-slate-500 tabular-nums">{time}</p>
+        {wa && (
+          <span className={cn('text-[10px] px-1.5 py-0 rounded border font-medium', wa.cls)}>
+            {wa.label}
+          </span>
+        )}
+      </div>
       <p className="text-sm font-semibold text-slate-900 truncate leading-tight">
         {apt.patient?.lastName}, {apt.patient?.firstName}
       </p>
@@ -172,7 +187,7 @@ export function AppointmentsPage() {
   const { data: appointments = [] } = useQuery({
     queryKey: ['appointments-range', rangeFrom, rangeTo],
     queryFn: () => appointmentsApi.range(rangeFrom, rangeTo).then((r) => r.data),
-    refetchInterval: 60000,
+    refetchInterval: 10000,
   });
 
   const statusMutation = useMutation({

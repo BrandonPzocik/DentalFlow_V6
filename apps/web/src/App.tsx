@@ -10,6 +10,7 @@ import { AppointmentsPage } from '@/pages/appointments/AppointmentsPage';
 import { BillingPage } from '@/pages/billing/BillingPage';
 import { SocialWorksPage } from '@/pages/billing/SocialWorksPage';
 import { NotificationsPage } from '@/pages/notifications/NotificationsPage';
+import { WhatsappMessagesPage } from '@/pages/notifications/WhatsappMessagesPage';
 import { SettingsPage } from '@/pages/settings/SettingsPage';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -38,6 +39,7 @@ export default function App() {
         <Route path="billing"      element={<BillingPage />} />
         <Route path="social-works" element={<SocialWorksPage />} />
         <Route path="notifications" element={<NotificationsPage />} />
+        <Route path="notifications/whatsapp" element={<WhatsappMessagesPage />} />
         <Route path="settings"     element={<SettingsPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

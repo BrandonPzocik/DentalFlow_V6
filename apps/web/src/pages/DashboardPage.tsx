@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Users, Calendar, DollarSign, AlertCircle } from 'lucide-react';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { appointmentsApi, patientsApi, billingApi } from '@/api';
+import { appointmentsApi, patientsApi, billingApi, whatsappApi } from '@/api';
 import { useAuthStore } from '@/store/auth.store';
 import { APPOINTMENT_STATUS_COLORS, APPOINTMENT_STATUS_LABELS, AppointmentStatus } from '@dentaflow/shared';
 import { cn } from '@/lib/utils';
@@ -64,6 +64,12 @@ export function DashboardPage() {
     queryFn: () => billingApi.summary(monthStart + 'T00:00:00', monthEnd + 'T23:59:59').then((r) => r.data),
   });
 
+  const { data: internalEvents = [] } = useQuery({
+    queryKey: ['whatsapp-internal'],
+    queryFn: () => whatsappApi.internal({ limit: 15 }).then((r) => r.data),
+    refetchInterval: 10000,
+  });
+
   const completedToday = todayApts.filter((a: any) => a.status === AppointmentStatus.COMPLETED).length;
   const pendingToday = todayApts.filter((a: any) =>
     [AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED].includes(a.status),
@@ -108,6 +114,24 @@ export function DashboardPage() {
           sub={`${aptStats?.absent ?? 0} ausencias`}
         />
       </div>
+
+      {internalEvents.length > 0 && (
+        <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
+          <div className="px-5 py-3 border-b border-slate-100 bg-slate-50/80">
+            <h2 className="text-sm font-semibold text-slate-800">Actividad WhatsApp reciente</h2>
+          </div>
+          <ul className="divide-y divide-slate-100">
+            {(internalEvents as any[]).map((ev: any) => (
+              <li key={ev.id} className={cn('px-5 py-3', !ev.read && 'bg-teal-50/40')}>
+                <p className="text-sm font-medium text-slate-900">{ev.body}</p>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {new Date(ev.createdAt).toLocaleString('es-AR')}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {fin && (
         <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">

@@ -50,6 +50,19 @@ export class Appointment {
   @Column({ default: false })
   reminderSent: boolean;
 
+  @Column({ default: false })
+  reminder48hSent: boolean;
+
+  @Column({ default: false })
+  reminder24hSent: boolean;
+
+  @Column({ default: false })
+  reminder2hSent: boolean;
+
+  /** sent | confirmed | cancelled | reschedule_requested */
+  @Column({ nullable: true })
+  whatsappStatus?: string;
+
   // Token used in the 48h reminder confirmation link
   @Column({ nullable: true, unique: false })
   confirmationToken?: string;

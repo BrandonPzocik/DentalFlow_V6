@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Send, Bell, Mail, CheckCircle, XCircle, Clock, Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Send, Bell, Mail, CheckCircle, XCircle, Clock, Search, MessageCircle } from 'lucide-react';
 import { notificationsApi, patientsApi } from '@/api';
 import { cn } from '@/lib/utils';
 
@@ -69,9 +70,14 @@ export function NotificationsPage() {
           <h1 className="page-title">Notificaciones por email</h1>
           <p className="text-slate-500 text-sm mt-0.5">Historial de correos enviados a pacientes</p>
         </div>
-        <button className="btn-primary" onClick={() => setShowCompose(true)}>
-          <Send size={16} /> Enviar email
-        </button>
+        <div className="flex gap-2">
+          <Link to="/notifications/whatsapp" className="btn-secondary">
+            <MessageCircle size={16} /> WhatsApp
+          </Link>
+          <button className="btn-primary" onClick={() => setShowCompose(true)}>
+            <Send size={16} /> Enviar email
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-3">

@@ -339,7 +339,8 @@ export function PatientDetailPage() {
             <Row label="Obra social" value={patient.socialWork ?? 'Particular'} />
             <Row label="Nº afiliado" value={patient.affiliateNumber ?? '—'} mono />
             <Row label="Plan" value={patient.plan ?? '—'} />
-            <Row label="Acepta email" value={patient.acceptsEmail ? 'Sí' : 'No'} />
+            <Row label="WhatsApp" value={patient.acceptsWhatsapp ? 'Sí' : 'No'} />
+            <Row label="Email (documentos)" value={patient.acceptsEmail ? 'Sí' : 'No'} />
           </div>
           {patient.medicalNotes && (
             <div className="card p-5 md:col-span-2">

@@ -1,0 +1,53 @@
+# Blueprint Render — https://render.com/docs/blueprint-spec
+# Crear desde el dashboard: New → Blueprint → conectar repo → aplicar este archivo
+
+databases:
+  - name: dentaflow-db
+    plan: free
+    databaseName: dentaflow
+    user: dentaflow
+
+services:
+  - type: web
+    name: dentaflow-api
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: >-
+      corepack enable &&
+      corepack prepare pnpm@9 --activate &&
+      pnpm install --frozen-lockfile &&
+      pnpm --filter @dentaflow/shared build &&
+      pnpm --filter api build
+    startCommand: pnpm --filter api start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: dentaflow-db
+          property: connectionString
+      # Primera vez: true para crear tablas; luego cambiar a false y redeploy
+      - key: DB_SYNCHRONIZE
+        value: "true"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 15m
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: 7d
+      - key: CORS_ORIGIN
+        value: http://localhost:5173
+      - key: CLINIC_NAME
+        value: Mi Consultorio Odontológico
+      - key: APP_URL
+        value: http://localhost:5173
+      # Completar en el dashboard de Render (Environment):
+      # TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_NUMBER
+      # GMAIL_USER, GMAIL_APP_PASSWORD (opcional)
+      # NO usar TWILIO_WEBHOOK_SKIP_VALIDATION en producción

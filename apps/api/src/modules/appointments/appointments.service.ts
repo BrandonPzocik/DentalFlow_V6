@@ -9,6 +9,7 @@ import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { AppointmentStatus } from '@dentaflow/shared';
 import { NotificationsService } from '../notifications/notifications.service';
 import { PatientsService } from '../patients/patients.service';
+import { WhatsappService } from '../whatsapp/whatsapp.service';
 
 @Injectable()
 export class AppointmentsService {
@@ -17,6 +18,7 @@ export class AppointmentsService {
     private readonly repo: Repository<Appointment>,
     private readonly notificationsService: NotificationsService,
     private readonly patientsService: PatientsService,
+    private readonly whatsappService: WhatsappService,
     private readonly config: ConfigService,
   ) {}
 
@@ -87,6 +89,10 @@ export class AppointmentsService {
       appointmentId: apt.id,
       acceptsEmail: patient.acceptsEmail ?? true,
     });
+
+    this.whatsappService.sendAppointmentCreated(patient, apt).catch((err: unknown) =>
+      console.error('Error enviando WhatsApp de turno:', err),
+    );
   }
 
   async update(id: string, dto: UpdateAppointmentDto): Promise<Appointment> {
@@ -167,6 +173,10 @@ export class AppointmentsService {
       }).catch((err: unknown) =>
         console.error('Error notificación cancelación:', err),
       );
+
+      this.whatsappService.sendAppointmentCancelled(apt.patient, saved).catch((err: unknown) =>
+        console.error('Error WhatsApp cancelación:', err),
+      );
     }
     return saved;
   }
@@ -181,7 +191,7 @@ export class AppointmentsService {
     await this.repo.save(apt);
 
     const baseUrl = this.config.get('APP_URL', 'http://localhost:3000');
-    const result = await this.notificationsService.sendReminderWithConfirmation({
+    const emailResult = await this.notificationsService.sendReminderWithConfirmation({
       patientName: `${apt.patient.firstName} ${apt.patient.lastName}`,
       patientEmail: apt.patient.email,
       dentistName: apt.dentist ? apt.dentist.lastName : 'el profesional',
@@ -195,16 +205,22 @@ export class AppointmentsService {
       baseUrl,
     });
 
-    if (!result) {
+    const waResult = await this.whatsappService.sendAppointmentReminder(apt.patient, apt);
+
+    if (!emailResult && !waResult.ok) {
       return {
         ok: false,
-        message: 'El paciente no tiene email o no acepta comunicaciones por correo',
+        message: 'No se pudo enviar recordatorio por email ni WhatsApp',
       };
     }
 
     apt.reminderSent = true;
     await this.repo.save(apt);
-    return result;
+
+    if (waResult.ok) {
+      return { ok: true, message: waResult.message, channel: 'whatsapp' };
+    }
+    return emailResult ?? { ok: true, message: 'Recordatorio enviado por email' };
   }
 
   async confirmByToken(token: string): Promise<{ ok: boolean; message: string }> {

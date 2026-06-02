@@ -1,8 +1,9 @@
 import {
-  Injectable, NotFoundException, ConflictException,
+  Injectable, NotFoundException, ConflictException, BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike } from 'typeorm';
+import { normalizePhoneToE164 } from '../whatsapp/phone.util';
 import { Patient } from './patient.entity';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
@@ -59,15 +60,29 @@ export class PatientsService {
     return this.patientRepo.findOne({ where: { dni } });
   }
 
+  private normalizePhoneField(phone: string): string {
+    const normalized = normalizePhoneToE164(phone);
+    if (!normalized) {
+      throw new BadRequestException(
+        'Teléfono inválido. Usá formato internacional, ej: 5493704123456',
+      );
+    }
+    return normalized;
+  }
+
   async create(dto: CreatePatientDto): Promise<Patient> {
     const exists = await this.findByDni(dto.dni);
     if (exists) throw new ConflictException(`Ya existe un paciente con DNI ${dto.dni}`);
-    const patient = this.patientRepo.create(dto);
+    const patient = this.patientRepo.create({
+      ...dto,
+      phone: this.normalizePhoneField(dto.phone),
+    });
     return this.patientRepo.save(patient);
   }
 
   async update(id: string, dto: UpdatePatientDto): Promise<Patient> {
     const patient = await this.findOne(id);
+    if (dto.phone) dto.phone = this.normalizePhoneField(dto.phone);
     Object.assign(patient, dto);
     return this.patientRepo.save(patient);
   }

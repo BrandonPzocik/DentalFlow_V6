@@ -14,6 +14,7 @@ export function NewPatientPage() {
     bloodType: '', hasAllergies: false, allergiesDetail: '',
     currentMedication: '', systemicDiseases: '',
     isPregnant: false, isBruxist: false,
+    acceptsWhatsapp: true,
     acceptsEmail: true,
     medicalNotes: '',
   });
@@ -172,8 +173,12 @@ export function NewPatientPage() {
         <div className="card p-5 space-y-3">
           <h2 className="section-title">Notificaciones</h2>
           <label className="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" className="rounded text-teal-600" checked={form.acceptsWhatsapp} onChange={(e) => set('acceptsWhatsapp', e.target.checked)} />
+            <span className="text-sm text-slate-700">Acepta turnos y recordatorios por WhatsApp</span>
+          </label>
+          <label className="flex items-center gap-3 cursor-pointer">
             <input type="checkbox" className="rounded text-teal-600" checked={form.acceptsEmail} onChange={(e) => set('acceptsEmail', e.target.checked)} />
-            <span className="text-sm text-slate-700">Acepta recordatorios y documentos por email</span>
+            <span className="text-sm text-slate-700">Acepta documentos clínicos por email</span>
           </label>
         </div>
 

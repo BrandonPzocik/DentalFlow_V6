@@ -15,6 +15,7 @@ Monorepo full-stack para la gestión integral de consultorios odontológicos: pa
 | Base de datos | PostgreSQL 16 |
 | Auth | JWT (access 15 min + refresh 7 días) |
 | Email | Nodemailer + Gmail (contraseña de aplicación) |
+| WhatsApp | Twilio WhatsApp API |
 
 ## Estructura del proyecto
 
@@ -90,12 +91,14 @@ Resumen por módulo de lo que incluye la aplicación hoy.
 - Indicadores del mes: pacientes en base, facturación, ausentismo.
 - Resumen financiero (cobrado, pendiente, obras sociales pendientes).
 - Listado ordenado de la agenda del día con estado de cada turno.
+- **Actividad WhatsApp reciente**: confirmaciones, cancelaciones y solicitudes de reprogramación del paciente.
 
 ### Pacientes
 
 - Alta y edición de ficha clínica (datos personales, obra social, antecedentes médicos).
 - Búsqueda por nombre o DNI y listado paginado.
-- Preferencia de contacto por **email** (recordatorios y documentos).
+- Teléfono en formato internacional (ej. `5493704123456`) — requerido para WhatsApp.
+- Preferencias: **WhatsApp** (turnos y recordatorios) y **email** (documentos clínicos).
 - Ficha del paciente con pestañas:
   - **Odontograma** — ver más abajo.
   - **Estudios** — radiografías e imágenes adjuntas por paciente.
@@ -120,21 +123,31 @@ Resumen por módulo de lo que incluye la aplicación hoy.
 - Franjas pasadas deshabilitadas: no se puede agendar en fecha/hora ya cumplida (validación en front y API).
 - Detección de **conflictos** de horario por profesional.
 - Estados: pendiente, confirmado, confirmado por paciente, en curso, atendido, ausente, cancelado.
-- Acciones desde el calendario: cambiar estado, cancelar con motivo, enviar recordatorio por email.
+- Acciones desde el calendario: cambiar estado, cancelar con motivo, enviar recordatorio.
+- Badges en turnos: **WA enviado**, **WA confirmado**, **WA cancelado**, **WA reprogramar**.
 - Creación de turno con búsqueda de paciente, duración, sillón y tipo de prestación.
 
-### Notificaciones (solo email)
+### Notificaciones
 
-- Envío vía **Gmail** (Nodemailer). Sin WhatsApp.
-- Al crear un turno: email de **confirmación** con diseño profesional (sin emojis).
-- Recordatorio manual desde agenda con enlace de **confirmación de asistencia**.
-- Cancelación de turno: email al paciente con detalle y motivo opcional.
-- Historial de envíos (éxito / fallo) en la pantalla Notificaciones.
-- Envío de mensajes personalizados a un paciente.
-- Envío de documentos clínicos por email:
-  - Recetas y presupuestos (desde Recetario del paciente).
-  - Comprobantes / facturas (desde detalle de factura).
-- Modo simulado si no hay credenciales Gmail: registra en log sin enviar correo real.
+**Email (Gmail)** — documentos clínicos y respaldo de turnos:
+
+- Recetas, presupuestos y facturas por correo.
+- Confirmación de turno por email (diseño profesional).
+- Recordatorio manual desde agenda (email + WhatsApp).
+- Historial en `/notifications`.
+
+**WhatsApp (Twilio)** — canal principal para turnos:
+
+- Al **crear turno**: mensaje con fecha/hora y opciones `1` confirmar, `2` cancelar, `3` reprogramar.
+- **Webhook** `POST /api/whatsapp/webhook`: interpreta respuestas del paciente.
+  - `1` / confirmar → estado `confirmado_por_paciente`
+  - `2` / cancelar → estado `cancelado` (motivo: cancelado por paciente vía WhatsApp)
+  - `3` / reprogramar → turno cancelado con motivo de solicitud; el consultorio coordina manualmente
+- **Recordatorios automáticos** (cron cada 10 min): 48 h, 24 h y 2 h antes (según flags en Configuración).
+- Tabla `whatsapp_messages`: todos los mensajes entrantes y salientes.
+- Notificaciones internas en dashboard para el equipo.
+- Historial paginado en `/notifications/whatsapp`.
+- Modo simulado sin credenciales Twilio (registra en BD igual que Gmail simulado).
 
 ### Recetario y presupuestos (por paciente)
 
@@ -169,7 +182,8 @@ Resumen por módulo de lo que incluye la aplicación hoy.
 ### Configuración
 
 - **Consultorio**: nombre, dirección, teléfono, email, logo, moneda, prefijo de facturas.
-- **Notificaciones**: recordatorios automáticos 48 h / 24 h / 2 h (flags; envío real depende de Gmail).
+- **Notificaciones**: recordatorios 48 h / 24 h / 2 h (email).
+- **WhatsApp**: activar canal, mensaje al crear turno, recordatorios WA 48/24/2 h, métricas Twilio.
 - **Agenda**: hora de apertura y cierre, días de atención (Lun–Dom), duración de franja del calendario.
 - **Mi cuenta**: perfil del usuario logueado y cambio de contraseña.
 
@@ -212,7 +226,42 @@ GMAIL_APP_PASSWORD=xxxx xxxx xxxx xxxx
 
 # URL base para links en emails (confirmación de turno)
 APP_URL=http://localhost:5173
+
+# WhatsApp — Twilio
+TWILIO_ACCOUNT_SID=ACxxxxxxxx
+TWILIO_AUTH_TOKEN=xxxxxxxx
+TWILIO_WHATSAPP_NUMBER=whatsapp:+14155238886
 ```
+
+### Configurar Twilio WhatsApp
+
+1. Creá una cuenta en [Twilio Console](https://console.twilio.com).
+2. Activá el sandbox de WhatsApp o un número aprobado para producción.
+3. Copiá `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` y el número (`whatsapp:+...`) en `.env`.
+4. Webhook entrante (mensajes y botones del paciente):
+   - **Recomendado:** desplegá la API en [Render](docs/DEPLOY-RENDER.md) → URL fija sin ngrok.
+   - **URL:** `https://TU-SERVICIO.onrender.com/api/whatsapp/webhook` (método **POST**).
+   - En local solo para pruebas: ngrok o `TWILIO_WEBHOOK_SKIP_VALIDATION=true` (no usar en producción).
+5. El webhook valida la **firma Twilio** en producción (`X-Twilio-Signature`).
+
+### Flujo de confirmación por WhatsApp (botones)
+
+1. Al arrancar la API, DentaFlow crea plantillas **quick-reply** en Twilio Content API (Confirmar / Cancelar / Reprogramar).
+2. Se crea un turno → el paciente recibe WhatsApp con **tres botones**.
+3. Al tocar un botón, Twilio llama al webhook → el turno pasa a `confirmed_by_patient`, `cancelled` o queda marcado para reprogramar.
+4. El equipo ve el evento en el **Dashboard** y badges en la **Agenda**.
+
+**Importante (sandbox):** si ves *"Configure your WhatsApp Sandbox's Inbound URL"*, el webhook **no está apuntando a tu API**. En [Twilio Sandbox](https://console.twilio.com/us1/develop/sms/try-it-out/whatsapp-learn), campo *When a message comes in*:
+
+`https://TU-NGROK.ngrok-free.app/api/whatsapp/webhook` (POST)
+
+En local podés usar `TWILIO_WEBHOOK_SKIP_VALIDATION=true` solo para pruebas con ngrok.
+
+### Cron de recordatorios
+
+- Usa `@nestjs/schedule` (cada 10 minutos).
+- Respeta `reminder_48h`, `reminder_24h`, `reminder_2h` y los flags `whatsapp_reminder_*` en Configuración.
+- El recordatorio de 2 h no se envía si el paciente ya confirmó (`confirmado_por_paciente`).
 
 ### Configurar Gmail
 
@@ -249,6 +298,7 @@ Sin `GMAIL_*`, los envíos se **simulan** y quedan registrados en el historial d
 | `/billing` | Facturación |
 | `/social-works` | Obras sociales |
 | `/notifications` | Notificaciones por email |
+| `/notifications/whatsapp` | Historial de mensajes WhatsApp |
 | `/settings` | Configuración |
 
 ---
@@ -256,8 +306,8 @@ Sin `GMAIL_*`, los envíos se **simulan** y quedan registrados en el historial d
 ## Pendiente / no incluido
 
 - Integración **AFIP** (factura electrónica oficial).
-- Recordatorios automáticos por cron (los flags en configuración existen; el disparo programado puede requerir un job externo).
-- Endpoint público de confirmación de turno: existe en API (`GET /appointments/confirm/:token`); verificar que esté accesible sin JWT en producción si se usa el link del email.
+- Reprogramación automática de turnos (la opción 3 solo registra la solicitud; el consultorio coordina manualmente).
+- Endpoint público de confirmación por **email** (`GET /appointments/confirm/:token`): requiere JWT hoy; usar WhatsApp como canal principal de confirmación.
 
 ---
 

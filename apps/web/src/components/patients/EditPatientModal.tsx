@@ -167,10 +167,16 @@ export function EditPatientModal({ patient, onClose }: Props) {
           {/* Notificaciones */}
           <section>
             <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Notificaciones</h3>
-            <label className="flex items-center gap-2 cursor-pointer text-sm text-slate-700">
-              <input type="checkbox" className="accent-teal-600" checked={form.acceptsEmail ?? true} onChange={(e) => set('acceptsEmail', e.target.checked)} />
-              Acepta recordatorios y documentos por email
-            </label>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 cursor-pointer text-sm text-slate-700">
+                <input type="checkbox" className="accent-teal-600" checked={form.acceptsWhatsapp ?? true} onChange={(e) => set('acceptsWhatsapp', e.target.checked)} />
+                Acepta turnos y recordatorios por WhatsApp
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer text-sm text-slate-700">
+                <input type="checkbox" className="accent-teal-600" checked={form.acceptsEmail ?? true} onChange={(e) => set('acceptsEmail', e.target.checked)} />
+                Acepta documentos clínicos por email
+              </label>
+            </div>
           </section>
 
           {mutation.isError && (

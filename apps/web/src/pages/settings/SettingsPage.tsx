@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Save, Settings, Building2, Bell, Calendar, DollarSign, User, KeyRound, Eye, EyeOff } from 'lucide-react';
-import { settingsApi, usersApi } from '@/api';
+import { Save, Settings, Building2, Bell, Calendar, DollarSign, User, KeyRound, Eye, EyeOff, MessageCircle } from 'lucide-react';
+import { settingsApi, usersApi, whatsappApi } from '@/api';
 import { useAuthStore } from '@/store/auth.store';
 import { cn } from '@/lib/utils';
 
-const TABS = ['Consultorio', 'Notificaciones', 'Agenda', 'Mi cuenta'] as const;
+const TABS = ['Consultorio', 'Notificaciones', 'WhatsApp', 'Agenda', 'Mi cuenta'] as const;
 type Tab = typeof TABS[number];
 
 const TAB_ICONS: Record<Tab, any> = {
   'Consultorio': Building2,
   'Notificaciones': Bell,
+  'WhatsApp': MessageCircle,
   'Agenda': Calendar,
   'Mi cuenta': User,
 };
@@ -45,6 +46,12 @@ export function SettingsPage() {
   const { data: flatSettings = {} } = useQuery({
     queryKey: ['settings-flat'],
     queryFn: () => settingsApi.getAll().then((r) => r.data),
+  });
+
+  const { data: waStatus } = useQuery({
+    queryKey: ['whatsapp-status'],
+    queryFn: () => whatsappApi.status().then((r) => r.data),
+    refetchInterval: 60000,
   });
 
   useEffect(() => {
@@ -141,7 +148,7 @@ export function SettingsPage() {
           <h2 className="section-title mb-2">Recordatorios automáticos</h2>
           <p className="text-sm text-slate-400 mb-5">Configurá cuándo y cómo se envían los recordatorios de turno.</p>
 
-          <SettingRow label="Recordatorio 48hs antes" description="Enviado por email con detalles del turno">
+          <SettingRow label="Recordatorio 48hs antes" description="Email + WhatsApp (si está activo)">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" className="accent-teal-600 w-4 h-4"
                 checked={settings['reminder_48h'] === 'true'}
@@ -149,7 +156,7 @@ export function SettingsPage() {
               <span className="text-sm text-slate-700">Activado</span>
             </label>
           </SettingRow>
-          <SettingRow label="Recordatorio 24hs antes" description="Enviado por email al paciente">
+          <SettingRow label="Recordatorio 24hs antes" description="Email + WhatsApp al paciente">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" className="accent-teal-600 w-4 h-4"
                 checked={settings['reminder_24h'] === 'true'}
@@ -175,6 +182,99 @@ export function SettingsPage() {
               <code className="font-mono bg-teal-100 px-1 rounded">APP_URL</code> (ej.{' '}
               <code className="font-mono bg-teal-100 px-1 rounded">http://localhost:5173</code>).
               Sin credenciales, los envíos se simulan y quedan en el historial.
+            </p>
+          </div>
+
+          <div className="flex justify-end mt-6">
+            <button className="btn-primary" onClick={() => saveMutation.mutate(settings)} disabled={saveMutation.isPending}>
+              <Save size={15} />
+              {saved ? '¡Guardado!' : 'Guardar cambios'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* WhatsApp */}
+      {activeTab === 'WhatsApp' && (
+        <div className="card p-6 space-y-4">
+          <h2 className="section-title mb-2">WhatsApp (Twilio)</h2>
+          <p className="text-sm text-slate-400 mb-4">
+            Turnos y recordatorios por WhatsApp. Los documentos clínicos siguen enviándose solo por email.
+          </p>
+
+          <div className="grid sm:grid-cols-3 gap-3 mb-6">
+            <div className="rounded-lg border border-slate-200 p-4">
+              <p className="text-xs text-slate-500">Estado Twilio</p>
+              <p className={cn('text-sm font-semibold mt-1', waStatus?.configured ? 'text-emerald-700' : 'text-amber-700')}>
+                {waStatus?.configured ? 'Conectado' : 'No configurado / simulado'}
+              </p>
+            </div>
+            <div className="rounded-lg border border-slate-200 p-4">
+              <p className="text-xs text-slate-500">Mensajes enviados</p>
+              <p className="text-lg font-semibold text-slate-900 mt-1">{waStatus?.sent ?? '—'}</p>
+            </div>
+            <div className="rounded-lg border border-slate-200 p-4">
+              <p className="text-xs text-slate-500">Fallidos</p>
+              <p className="text-lg font-semibold text-red-600 mt-1">{waStatus?.failed ?? '—'}</p>
+            </div>
+          </div>
+
+          <SettingRow label="WhatsApp activo" description="Desactiva todos los envíos por WhatsApp">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" className="accent-teal-600 w-4 h-4"
+                checked={settings['whatsapp_enabled'] !== 'false'}
+                onChange={(e) => set('whatsapp_enabled', e.target.checked ? 'true' : 'false')} />
+              <span className="text-sm text-slate-700">Activado</span>
+            </label>
+          </SettingRow>
+          <SettingRow label="Mensaje al crear turno" description="Confirmación con opciones 1/2/3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" className="accent-teal-600 w-4 h-4"
+                checked={settings['whatsapp_auto_on_create'] !== 'false'}
+                onChange={(e) => set('whatsapp_auto_on_create', e.target.checked ? 'true' : 'false')} />
+              <span className="text-sm text-slate-700">Activado</span>
+            </label>
+          </SettingRow>
+          <SettingRow label="Recordatorio WhatsApp 48h">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" className="accent-teal-600 w-4 h-4"
+                checked={settings['whatsapp_reminder_48h'] !== 'false'}
+                onChange={(e) => set('whatsapp_reminder_48h', e.target.checked ? 'true' : 'false')} />
+              <span className="text-sm text-slate-700">Activado</span>
+            </label>
+          </SettingRow>
+          <SettingRow label="Recordatorio WhatsApp 24h">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" className="accent-teal-600 w-4 h-4"
+                checked={settings['whatsapp_reminder_24h'] !== 'false'}
+                onChange={(e) => set('whatsapp_reminder_24h', e.target.checked ? 'true' : 'false')} />
+              <span className="text-sm text-slate-700">Activado</span>
+            </label>
+          </SettingRow>
+          <SettingRow label="Recordatorio WhatsApp 2h" description="Solo si el turno no fue confirmado por el paciente">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" className="accent-teal-600 w-4 h-4"
+                checked={settings['whatsapp_reminder_2h'] !== 'false'}
+                onChange={(e) => set('whatsapp_reminder_2h', e.target.checked ? 'true' : 'false')} />
+              <span className="text-sm text-slate-700">Activado</span>
+            </label>
+          </SettingRow>
+
+          <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 space-y-2">
+            <p>
+              Los turnos se envían con <strong>botones</strong> Confirmar, Cancelar y Reprogramar.
+              Al tocarlos, el estado del turno se actualiza en la agenda.
+            </p>
+            <p>
+              Variables en <code className="font-mono bg-white px-1 rounded">apps/api/.env</code>:{' '}
+              <code className="font-mono">TWILIO_ACCOUNT_SID</code>,{' '}
+              <code className="font-mono">TWILIO_AUTH_TOKEN</code>,{' '}
+              <code className="font-mono">TWILIO_WHATSAPP_NUMBER</code>.
+            </p>
+            <p>
+              En Twilio Sandbox, <strong>When a message comes in</strong> debe ser tu URL pública +{' '}
+              <code className="font-mono">/api/whatsapp/webhook</code> (ngrok en local).
+              Sin eso, Twilio responde con el mensaje de prueba y no se actualiza el turno.
             </p>
           </div>
 

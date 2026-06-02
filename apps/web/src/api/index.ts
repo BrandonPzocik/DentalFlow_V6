@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '@/store/auth.store';
 
 export const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL ?? '/api',
   headers: { 'Content-Type': 'application/json' },
   timeout: 15000,
 });
@@ -130,6 +130,22 @@ export const notificationsApi = {
     type: string;
   }) => api.post('/notifications/send-document', data),
   sendReminder: (data: any) => api.post('/notifications/reminder', data),
+};
+
+// ── WhatsApp ──────────────────────────────────────────────────────────────────
+export const whatsappApi = {
+  status: () => api.get('/whatsapp/status'),
+  messages: (params?: {
+    direction?: string;
+    status?: string;
+    page?: number;
+    limit?: number;
+  }) => api.get('/whatsapp/messages', { params }),
+  internal: (params?: { limit?: number; unreadOnly?: boolean }) =>
+    api.get('/whatsapp/internal', { params }),
+  unreadCount: () => api.get('/whatsapp/internal/unread-count'),
+  markRead: (id: string) => api.patch(`/whatsapp/internal/${id}/read`),
+  markAllRead: () => api.post('/whatsapp/internal/read-all'),
 };
 
 // ── Settings ──────────────────────────────────────────────────────────────────

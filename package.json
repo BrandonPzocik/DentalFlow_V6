@@ -2,7 +2,6 @@
   "name": "dentaflow",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "pnpm@9.15.0",
   "scripts": {
     "dev": "pnpm --filter @dentaflow/shared build && pnpm --parallel --filter './apps/*' dev",
     "build": "pnpm --filter './packages/*' build && pnpm --filter './apps/*' build",
@@ -14,7 +13,7 @@
     "db:seed": "pnpm --filter api db:seed"
   },
   "engines": {
-    "node": ">=20",
+    "node": ">=20.0.0 <21.0.0",
     "pnpm": ">=9"
   }
 }

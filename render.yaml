@@ -28,6 +28,8 @@ services:
           property: connectionString
       - key: DB_SYNCHRONIZE
         value: "true"
+      - key: SEED_ON_START
+        value: "true"
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_REFRESH_SECRET

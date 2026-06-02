@@ -55,14 +55,20 @@ En el servicio **dentaflow-api** → **Environment**, agregá o revisá:
 
 ## 4. Crear usuario admin en la base de producción
 
-1. Servicio **dentaflow-api** → pestaña **Shell**.
-2. Ejecutá:
+**Opción A — sin Shell (plan free):** en **dentaflow-api** → **Environment** agregá:
 
-```bash
-pnpm --filter api db:seed
+```env
+SEED_ON_START=true
 ```
 
-Credenciales: `admin@dentaflow.com` / `Admin123!`
+**Manual Deploy**. Al arrancar crea `admin@dentaflow.com` / `Admin123!`. Luego cambiá a `false` y redeploy.
+
+**Opción B — desde tu Mac:** **dentaflow-db** → **Connections** → **External Database URL**:
+
+```bash
+cd apps/api
+DATABASE_URL="postgresql://..." pnpm db:seed
+```
 
 ---
 

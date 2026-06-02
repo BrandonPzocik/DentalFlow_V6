@@ -7,6 +7,7 @@ import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
+import { runSeed } from './database/run-seed';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -17,6 +18,11 @@ async function bootstrap() {
   );
 
   const configService = app.get(ConfigService);
+
+  if (configService.get('SEED_ON_START') === 'true') {
+    await runSeed(app);
+  }
+
   const port = configService.get<number>('PORT', 3000);
 
   await app.register(require('@fastify/helmet'));

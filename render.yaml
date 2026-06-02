@@ -14,12 +14,10 @@ services:
     plan: free
     region: oregon
     buildCommand: |
-      npm install -g corepack@latest
-      corepack enable
-      corepack prepare pnpm@9.15.0 --activate
+      npm install -g pnpm@9.15.0
       pnpm install --frozen-lockfile
       pnpm run build:render
-    startCommand: pnpm run start:render
+    startCommand: node apps/api/dist/main.js
     healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION

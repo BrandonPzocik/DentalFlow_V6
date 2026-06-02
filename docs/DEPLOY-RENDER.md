@@ -152,6 +152,7 @@ WhatsApp entrante de whatsapp:+549... [payload=confirm]
 
 | Problema | Solución |
 |----------|----------|
+| `EROFS: read-only file system` con `corepack enable` | **No uses corepack.** Build: `npm install -g pnpm@9.15.0 && pnpm install --frozen-lockfile && pnpm run build:render`. Start: `node apps/api/dist/main.js` |
 | Build falla | Revisá **Logs** del deploy; Node 20+ y `pnpm-lock.yaml` en el repo |
 | 502 / timeout | Plan free dormido; esperá y reintentá |
 | Twilio “firma inválida” | No uses `TWILIO_WEBHOOK_SKIP_VALIDATION`; URL del webhook = dominio Render exacto |

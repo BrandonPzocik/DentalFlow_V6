@@ -24,6 +24,38 @@ export function normalizePhoneToE164(raw: string): string | null {
   return null;
 }
 
+/** Variantes equivalentes para comparar (Twilio vs lo guardado en ficha). */
+export function phoneMatchKeys(raw: string): Set<string> {
+  const digits = raw.replace(/\D/g, '');
+  const normalized = normalizePhoneToE164(raw) ?? digits;
+  const keys = new Set<string>();
+
+  for (const d of [normalized, digits]) {
+    if (!d) continue;
+    keys.add(d);
+    if (d.length >= 8) keys.add(d.slice(-8));
+    if (d.length >= 10) keys.add(d.slice(-10));
+    if (d.startsWith('54') && d.length > 2) keys.add(d.slice(2));
+    // móvil AR: 54 + 9 + área + número ↔ sin el 9
+    if (d.startsWith('549') && d.length === 13) {
+      keys.add(`54${d.slice(3)}`);
+    }
+    if (d.startsWith('54') && d.length === 12 && d[2] !== '9') {
+      keys.add(`${d.slice(0, 2)}9${d.slice(2)}`);
+    }
+  }
+
+  return keys;
+}
+
+export function phonesMatch(a: string, b: string): boolean {
+  const keysA = phoneMatchKeys(a);
+  for (const key of phoneMatchKeys(b)) {
+    if (keysA.has(key)) return true;
+  }
+  return false;
+}
+
 export function toWhatsappAddress(e164: string): string {
   const clean = e164.replace(/\D/g, '');
   return `whatsapp:+${clean}`;

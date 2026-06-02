@@ -7,7 +7,7 @@ import { Appointment } from '../appointments/appointment.entity';
 import { WhatsappService } from './whatsapp.service';
 import { InternalNotificationService } from './internal-notification.service';
 import { InternalNotificationType } from './internal-notification.entity';
-import { fromTwilioWhatsappAddress, normalizePhoneToE164 } from './phone.util';
+import { fromTwilioWhatsappAddress, normalizePhoneToE164, phonesMatch } from './phone.util';
 
 type InboundIntent = 'confirm' | 'cancel' | 'reschedule' | 'unknown';
 
@@ -40,13 +40,17 @@ export class WhatsappInboundService {
   async findPatientByPhone(from: string): Promise<Patient | null> {
     const e164 = fromTwilioWhatsappAddress(from);
     const normalized = normalizePhoneToE164(e164) ?? e164.replace(/\D/g, '');
-    const patients = await this.patientRepo.find();
-    return (
-      patients.find((p) => {
-        const pNorm = normalizePhoneToE164(p.phone);
-        return pNorm === normalized || p.phone.replace(/\D/g, '') === normalized;
-      }) ?? null
-    );
+    const patients = await this.patientRepo.find({ where: { isActive: true } });
+
+    const match = patients.find((p) => phonesMatch(normalized, p.phone)) ?? null;
+    if (!match) {
+      this.logger.warn(
+        `WhatsApp de número desconocido: ${from} (normalizado: ${normalized}). ` +
+          `Pacientes activos en BD: ${patients.length}. ` +
+          `Verificá que el teléfono en la ficha coincida, ej: ${normalized}.`,
+      );
+    }
+    return match;
   }
 
   async findNextPendingAppointment(patientId: string): Promise<Appointment | null> {
@@ -87,7 +91,6 @@ export class WhatsappInboundService {
   ): Promise<string> {
     const patient = await this.findPatientByPhone(from);
     if (!patient) {
-      this.logger.warn(`WhatsApp de número desconocido: ${from}`);
       return 'No encontramos su registro. Contacte al consultorio.';
     }
 

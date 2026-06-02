@@ -19,10 +19,19 @@ export class WhatsappContentService implements OnModuleInit {
     private readonly settingsService: SettingsService,
   ) {}
 
+  private hasTwilioCredentials(): boolean {
+    const sid = this.config.get('TWILIO_ACCOUNT_SID')?.trim();
+    const token = this.config.get('TWILIO_AUTH_TOKEN')?.trim();
+    return !!(sid && token && sid.startsWith('AC'));
+  }
+
   async onModuleInit() {
-    const sid = this.config.get('TWILIO_ACCOUNT_SID');
-    const token = this.config.get('TWILIO_AUTH_TOKEN');
-    if (!sid || !token) return;
+    if (!this.hasTwilioCredentials()) {
+      this.logger.warn(
+        'Twilio no configurado en el servidor — plantillas WhatsApp omitidas (mensajes de texto)',
+      );
+      return;
+    }
 
     try {
       await this.ensureTemplates();
@@ -32,9 +41,10 @@ export class WhatsappContentService implements OnModuleInit {
     }
   }
 
-  private authHeader(): string {
-    const sid = this.config.get('TWILIO_ACCOUNT_SID', '');
-    const token = this.config.get('TWILIO_AUTH_TOKEN', '');
+  private authHeader(): string | null {
+    if (!this.hasTwilioCredentials()) return null;
+    const sid = this.config.get('TWILIO_ACCOUNT_SID', '').trim();
+    const token = this.config.get('TWILIO_AUTH_TOKEN', '').trim();
     return `Basic ${Buffer.from(`${sid}:${token}`).toString('base64')}`;
   }
 
@@ -42,10 +52,15 @@ export class WhatsappContentService implements OnModuleInit {
     path: string,
     init?: RequestInit,
   ): Promise<T> {
+    const auth = this.authHeader();
+    if (!auth) {
+      throw new Error('Twilio no configurado');
+    }
+
     const res = await fetch(`${CONTENT_API}${path}`, {
       ...init,
       headers: {
-        Authorization: this.authHeader(),
+        Authorization: auth,
         'Content-Type': 'application/json',
         ...(init?.headers ?? {}),
       },
@@ -86,10 +101,12 @@ export class WhatsappContentService implements OnModuleInit {
   }
 
   async ensureTemplates(): Promise<void> {
+    if (!this.hasTwilioCredentials()) return;
+
     const appointmentSid = await this.settingsService.get('whatsapp_content_appointment_sid');
     const reminderSid = await this.settingsService.get('whatsapp_content_reminder_sid');
 
-    if (!appointmentSid) {
+    if (!appointmentSid?.trim()) {
       const sid = await this.createQuickReplyTemplate({
         friendlyName: 'dentaflow_turno_registrado',
         body:
@@ -101,7 +118,7 @@ export class WhatsappContentService implements OnModuleInit {
       await this.settingsService.set('whatsapp_content_appointment_sid', sid);
     }
 
-    if (!reminderSid) {
+    if (!reminderSid?.trim()) {
       const sid = await this.createQuickReplyTemplate({
         friendlyName: 'dentaflow_recordatorio_turno',
         body:
@@ -113,21 +130,30 @@ export class WhatsappContentService implements OnModuleInit {
     }
   }
 
-  async getAppointmentContentSid(): Promise<string | null> {
-    let sid = await this.settingsService.get('whatsapp_content_appointment_sid');
-    if (!sid?.trim()) {
-      await this.ensureTemplates();
-      sid = await this.settingsService.get('whatsapp_content_appointment_sid');
+  private async resolveContentSid(
+    settingKey: 'whatsapp_content_appointment_sid' | 'whatsapp_content_reminder_sid',
+  ): Promise<string | null> {
+    if (!this.hasTwilioCredentials()) return null;
+
+    try {
+      let sid = await this.settingsService.get(settingKey);
+      if (!sid?.trim()) {
+        await this.ensureTemplates();
+        sid = await this.settingsService.get(settingKey);
+      }
+      return sid?.trim() || null;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.logger.warn(`Plantillas WhatsApp no disponibles (${settingKey}): ${msg}`);
+      return null;
     }
-    return sid?.trim() || null;
+  }
+
+  async getAppointmentContentSid(): Promise<string | null> {
+    return this.resolveContentSid('whatsapp_content_appointment_sid');
   }
 
   async getReminderContentSid(): Promise<string | null> {
-    let sid = await this.settingsService.get('whatsapp_content_reminder_sid');
-    if (!sid?.trim()) {
-      await this.ensureTemplates();
-      sid = await this.settingsService.get('whatsapp_content_reminder_sid');
-    }
-    return sid?.trim() || null;
+    return this.resolveContentSid('whatsapp_content_reminder_sid');
   }
 }

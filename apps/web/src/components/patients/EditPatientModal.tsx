@@ -44,12 +44,12 @@ export function EditPatientModal({ patient, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl my-6 animate-slide-up">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+      <div className="modal-shell w-full max-w-2xl my-6">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl z-10">
-          <h2 className="font-semibold text-slate-800 text-lg">Editar paciente</h2>
-          <button className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors" onClick={onClose}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white z-10">
+          <h2 className="section-heading">Editar paciente</h2>
+          <button className="p-1.5 hover:bg-slate-100 border border-transparent transition-colors" onClick={onClose}>
             <X size={18} className="text-slate-500" />
           </button>
         </div>
@@ -57,7 +57,7 @@ export function EditPatientModal({ patient, onClose }: Props) {
         <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto max-h-[70vh]">
           {/* Datos personales */}
           <section>
-            <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Datos personales</h3>
+            <h3 className="nav-section-label mb-3">Datos personales</h3>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="label">Nombre *</label>
@@ -100,7 +100,7 @@ export function EditPatientModal({ patient, onClose }: Props) {
 
           {/* Cobertura */}
           <section>
-            <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Cobertura médica</h3>
+            <h3 className="nav-section-label mb-3">Cobertura médica</h3>
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <label className="label">Obra social</label>
@@ -124,7 +124,7 @@ export function EditPatientModal({ patient, onClose }: Props) {
 
           {/* Antecedentes */}
           <section>
-            <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Antecedentes médicos</h3>
+            <h3 className="nav-section-label mb-3">Antecedentes médicos</h3>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="label">Grupo sanguíneo</label>
@@ -166,7 +166,7 @@ export function EditPatientModal({ patient, onClose }: Props) {
 
           {/* Notificaciones */}
           <section>
-            <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Notificaciones</h3>
+            <h3 className="nav-section-label mb-3">Notificaciones</h3>
             <div className="space-y-2">
               <label className="flex items-center gap-2 cursor-pointer text-sm text-slate-700">
                 <input type="checkbox" className="accent-teal-600" checked={form.acceptsWhatsapp ?? true} onChange={(e) => set('acceptsWhatsapp', e.target.checked)} />
@@ -180,13 +180,13 @@ export function EditPatientModal({ patient, onClose }: Props) {
           </section>
 
           {mutation.isError && (
-            <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+            <p className="text-sm text-red-500 bg-red-50 border border-red-200 px-4 py-3">
               {(mutation.error as any)?.response?.data?.message ?? 'Error al guardar'}
             </p>
           )}
         </form>
 
-        <div className="flex gap-3 px-6 py-4 border-t border-slate-200 bg-slate-50 rounded-b-2xl">
+        <div className="flex gap-3 px-6 py-4 border-t border-slate-200 bg-slate-50">
           <button className="btn-secondary flex-1" onClick={onClose}>Cancelar</button>
           <button className="btn-primary flex-1" onClick={handleSubmit as any} disabled={mutation.isPending}>
             <Save size={15} />

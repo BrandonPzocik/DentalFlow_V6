@@ -26,8 +26,13 @@ async function bootstrap() {
   const port = configService.get<number>('PORT', 3000);
 
   await app.register(require('@fastify/helmet'));
+  const corsOrigin = configService.get<string>('CORS_ORIGIN', 'http://localhost:5173');
+  const origins = corsOrigin.includes(',')
+    ? corsOrigin.split(',').map((o) => o.trim()).filter(Boolean)
+    : corsOrigin;
+
   app.enableCors({
-    origin: configService.get('CORS_ORIGIN', 'http://localhost:5173'),
+    origin: origins,
     credentials: true,
   });
 

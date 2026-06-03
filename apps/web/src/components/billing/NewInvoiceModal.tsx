@@ -85,11 +85,11 @@ export function NewInvoiceModal({ onClose, onSuccess }: Props) {
   const nomItems = selectedSW?.nomenclator?.filter((n: any) => n.isActive) ?? [];
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl my-6 animate-slide-up">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl z-10">
-          <h2 className="font-semibold text-slate-800 text-lg">Nueva factura</h2>
-          <button className="p-1.5 hover:bg-slate-100 rounded-lg" onClick={onClose}><X size={18} /></button>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+      <div className="modal-shell w-full max-w-3xl my-6">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white z-10">
+          <h2 className="section-heading">Nueva factura</h2>
+          <button className="p-1.5 hover:bg-slate-100 border border-transparent" onClick={onClose}><X size={18} /></button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto max-h-[75vh]">
@@ -97,9 +97,9 @@ export function NewInvoiceModal({ onClose, onSuccess }: Props) {
           <div>
             <label className="label">Paciente *</label>
             {selectedPatient ? (
-              <div className="flex items-center justify-between bg-teal-50 border border-teal-200 rounded-xl px-4 py-3">
+              <div className="flex items-center justify-between bg-teal-50 border border-teal-200 px-4 py-3">
                 <div>
-                  <p className="font-semibold text-teal-800">{selectedPatient.lastName}, {selectedPatient.firstName}</p>
+                  <p className="font-medium text-teal-800">{selectedPatient.lastName}, {selectedPatient.firstName}</p>
                   <p className="text-xs text-teal-600">DNI {selectedPatient.dni} · {selectedPatient.socialWork ?? 'Particular'}</p>
                 </div>
                 <button type="button" className="text-teal-400 hover:text-teal-600" onClick={() => setSelectedPatient(null)}><X size={16} /></button>
@@ -110,7 +110,7 @@ export function NewInvoiceModal({ onClose, onSuccess }: Props) {
                 <input className="input pl-8" placeholder="Buscar por nombre o DNI…"
                   value={patientSearch} onChange={(e) => setPatientSearch(e.target.value)} />
                 {searchResults && searchResults.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-10 max-h-44 overflow-y-auto">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 z-10 max-h-44 overflow-y-auto">
                     {searchResults.map((p: any) => (
                       <button key={p.id} type="button" className="w-full text-left px-4 py-2.5 hover:bg-slate-50 border-b border-slate-100 last:border-0"
                         onClick={() => {
@@ -185,12 +185,12 @@ export function NewInvoiceModal({ onClose, onSuccess }: Props) {
 
             {/* Quick fill from nomenclator */}
             {nomItems.length > 0 && (
-              <div className="mb-3 p-3 bg-slate-50 rounded-xl">
+              <div className="mb-3 p-3 bg-slate-50 border border-slate-200">
                 <p className="text-xs text-slate-500 font-medium mb-2">Carga rápida desde nomenclador {selectedSW?.name}</p>
                 <div className="flex flex-wrap gap-1.5">
                   {nomItems.slice(0, 8).map((nom: any) => (
                     <button key={nom.id} type="button"
-                      className="text-xs px-2.5 py-1 bg-white border border-slate-200 rounded-lg hover:border-teal-400 hover:bg-teal-50 transition-colors"
+                      className="text-xs px-2.5 py-1 bg-white border border-slate-200 hover:border-teal-400 hover:bg-teal-50 transition-colors"
                       onClick={() => fillFromNomenclator(items.length - 1, nom)}>
                       {nom.code} — {nom.description}
                     </button>
@@ -201,7 +201,7 @@ export function NewInvoiceModal({ onClose, onSuccess }: Props) {
 
             <div className="space-y-2">
               {items.map((item, i) => (
-                <div key={i} className="grid grid-cols-12 gap-2 items-start p-3 bg-slate-50 rounded-xl">
+                <div key={i} className="grid grid-cols-12 gap-2 items-start p-3 bg-slate-50 border border-slate-200">
                   <div className="col-span-5">
                     <label className="label">Descripción</label>
                     <input className="input bg-white" value={item.description}
@@ -234,7 +234,7 @@ export function NewInvoiceModal({ onClose, onSuccess }: Props) {
           </div>
 
           {/* Totals */}
-          <div className="bg-slate-50 rounded-xl p-4 space-y-2">
+          <div className="bg-slate-50 border border-slate-200 p-4 space-y-2">
             <div className="flex justify-between text-sm text-slate-600">
               <span>Subtotal</span>
               <span>${subtotal.toLocaleString('es-AR')}</span>
@@ -248,7 +248,7 @@ export function NewInvoiceModal({ onClose, onSuccess }: Props) {
               </div>
               <span className="text-red-500">- ${discountAmt.toLocaleString('es-AR')}</span>
             </div>
-            <div className="flex justify-between font-bold text-slate-800 text-base pt-2 border-t border-slate-200">
+            <div className="flex justify-between font-medium text-slate-800 text-base pt-2 border-t border-slate-200">
               <span>Total</span>
               <span className="text-teal-700">${total.toLocaleString('es-AR')}</span>
             </div>
@@ -260,13 +260,13 @@ export function NewInvoiceModal({ onClose, onSuccess }: Props) {
           </div>
 
           {mutation.isError && (
-            <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+            <p className="text-sm text-red-500 bg-red-50 border border-red-200 px-4 py-3">
               {(mutation.error as any)?.response?.data?.message ?? 'Error al crear la factura'}
             </p>
           )}
         </form>
 
-        <div className="flex gap-3 px-6 py-4 border-t border-slate-200 bg-slate-50 rounded-b-2xl">
+        <div className="flex gap-3 px-6 py-4 border-t border-slate-200 bg-slate-50">
           <button className="btn-secondary flex-1" onClick={onClose}>Cancelar</button>
           <button className="btn-primary flex-1" onClick={handleSubmit as any}
             disabled={mutation.isPending || !selectedPatient || items.every((i) => !i.description)}>

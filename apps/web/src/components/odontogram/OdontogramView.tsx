@@ -139,7 +139,7 @@ function Legend() {
     <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-2">
       {items.map((s) => (
         <div key={s} className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-sm shrink-0" style={{ backgroundColor: TOOTH_STATUS_COLORS[s] }} />
+          <span className="w-3 h-3 shrink-0" style={{ backgroundColor: TOOTH_STATUS_COLORS[s] }} />
           <span className="text-xs text-slate-500">{TOOTH_STATUS_LABELS[s]}</span>
         </div>
       ))}
@@ -189,7 +189,7 @@ export function OdontogramView({ odontogram, selection, onSelect }: OdontogramPr
   }
 
   return (
-    <div className="card p-5 overflow-x-auto">
+    <div className="panel p-5 overflow-x-auto">
       <p className="text-xs text-slate-500 mb-3">
         Clic en un diente o en una cara. El formulario de prestación aparece debajo.
       </p>

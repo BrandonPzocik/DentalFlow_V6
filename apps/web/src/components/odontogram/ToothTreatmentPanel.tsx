@@ -22,10 +22,10 @@ export function ToothTreatmentPanel({
   const { toothNumber, surface } = selection;
 
   return (
-    <div className="card p-4 animate-slide-up">
+    <div className="panel p-4 animate-slide-up">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="font-semibold text-slate-800">
+          <h3 className="section-heading">
             Diente {toothNumber}
             {surface ? (
               <span className="text-teal-600">

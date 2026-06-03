@@ -303,7 +303,13 @@ Sin `GMAIL_*`, los envíos se **simulan** y quedan registrados en el historial d
 
 ---
 
-## Pendiente / no incluido
+## Despliegue en producción
+
+| Componente | Guía |
+|------------|------|
+| API + Postgres + webhook Twilio | [docs/DEPLOY-RENDER.md](docs/DEPLOY-RENDER.md) |
+| Frontend (Vercel) + CORS | [docs/DEPLOY-VERCEL.md](docs/DEPLOY-VERCEL.md) |
+
 
 - Integración **AFIP** (factura electrónica oficial).
 - Reprogramación automática de turnos (la opción 3 solo registra la solicitud; el consultorio coordina manualmente).

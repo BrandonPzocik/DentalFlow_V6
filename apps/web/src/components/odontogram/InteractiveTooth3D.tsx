@@ -257,9 +257,9 @@ export function InteractiveTooth3D({
   const isMolar = [6, 7, 8].includes(toothNumber % 10);
 
   return (
-    <div className="relative h-56 w-full rounded-2xl overflow-hidden bg-gradient-to-br from-slate-100 via-white to-teal-50/30 border border-slate-200/90 shadow-inner">
-      <p className="absolute left-3 top-2 z-10 text-[10px] text-slate-400 pointer-events-none leading-tight">
-        <span className="font-semibold text-slate-500">Vista 3D</span>
+    <div className="relative h-56 w-full rounded-2xl overflow-hidden bg-gradient-to-br from-slate-100 via-white to-teal-50/30 border border-slate-200">
+      <p className="absolute left-3 top-2 z-10 text-micro text-slate-400 pointer-events-none leading-tight">
+        <span className="font-medium text-slate-500">Vista 3D</span>
         <br />
         Clic en una cara · arrastrá para rotar
       </p>

@@ -45,7 +45,7 @@ export function WhatsappMessagesPage() {
           <ArrowLeft size={16} /> Volver
         </Link>
         <div>
-          <h1 className="page-title">Historial WhatsApp</h1>
+          <h1 className="page-heading">Historial WhatsApp</h1>
           <p className="text-slate-500 text-sm">Mensajes enviados y recibidos vía Twilio</p>
         </div>
       </div>
@@ -60,7 +60,7 @@ export function WhatsappMessagesPage() {
             key={f.v}
             type="button"
             className={cn(
-              'px-3 py-1.5 rounded-lg text-sm font-medium border',
+              'px-3 py-1.5 text-sm font-medium border',
               direction === f.v
                 ? 'bg-slate-800 text-white border-slate-800'
                 : 'bg-white text-slate-600 border-slate-200',
@@ -79,7 +79,7 @@ export function WhatsappMessagesPage() {
             key={f.v}
             type="button"
             className={cn(
-              'px-3 py-1.5 rounded-lg text-sm font-medium border',
+              'px-3 py-1.5 text-sm font-medium border',
               status === f.v
                 ? 'bg-red-600 text-white border-red-600'
                 : 'bg-white text-slate-600 border-slate-200',
@@ -91,7 +91,7 @@ export function WhatsappMessagesPage() {
         ))}
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
+      <div className="panel overflow-hidden">
         {isLoading ? (
           <div className="p-10 text-center text-slate-400">Cargando…</div>
         ) : items.length === 0 ? (
@@ -105,7 +105,7 @@ export function WhatsappMessagesPage() {
               <div key={m.id} className="px-5 py-4 flex gap-4 hover:bg-slate-50">
                 <div
                   className={cn(
-                    'w-9 h-9 rounded-lg flex items-center justify-center shrink-0',
+                    'w-9 h-9 flex items-center justify-center shrink-0',
                     m.direction === 'INBOUND' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600',
                   )}
                 >
@@ -113,10 +113,10 @@ export function WhatsappMessagesPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-sm font-semibold text-slate-900">
+                    <p className="text-sm font-medium text-slate-900">
                       {m.patient?.lastName}, {m.patient?.firstName}
                     </p>
-                    <span className="text-xs px-2 py-0.5 rounded border border-slate-200 text-slate-600">
+                    <span className="badge-pill border border-slate-200 text-slate-600">
                       {STATUS_LABELS[m.status] ?? m.status}
                     </span>
                   </div>

@@ -55,8 +55,8 @@ export function SocialWorksPage() {
     <div className="space-y-5 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="page-title">Obras Sociales</h1>
-          <p className="text-slate-500 text-sm mt-0.5">Nomencladores y aranceles por cobertura</p>
+          <h1 className="page-heading">Obras sociales</h1>
+          <p className="meta-label mt-1">Nomencladores y aranceles por cobertura</p>
         </div>
         <button className="btn-primary" onClick={() => setShowNew(true)}>
           <Plus size={16} /> Nueva obra social
@@ -65,8 +65,8 @@ export function SocialWorksPage() {
 
       {/* New SW form */}
       {showNew && (
-        <div className="card p-5 border-teal-200 bg-teal-50/30 animate-slide-up">
-          <h3 className="section-title mb-4">Nueva obra social</h3>
+        <div className="panel p-4 border-teal-200 bg-teal-50/30 animate-slide-up">
+          <h3 className="section-heading mb-4">Nueva obra social</h3>
           <div className="grid grid-cols-2 gap-3 mb-4">
             <div><label className="label">Nombre *</label>
               <input className="input" value={newForm.name} onChange={(e) => setNewForm((f) => ({ ...f, name: e.target.value }))} placeholder="OSDE" /></div>
@@ -90,12 +90,12 @@ export function SocialWorksPage() {
       {/* Social works list */}
       {isLoading ? (
         <div className="space-y-3">
-          {[1,2,3].map((i) => <div key={i} className="card p-5 h-20 animate-pulse bg-slate-100" />)}
+          {[1,2,3].map((i) => <div key={i} className="panel p-4 h-20 animate-pulse bg-slate-100" />)}
         </div>
       ) : (socialWorks as any[]).length === 0 ? (
-        <div className="card p-12 text-center text-slate-400">
-          <Building2 className="w-12 h-12 mx-auto mb-3 text-slate-200" />
-          <p>No hay obras sociales registradas</p>
+        <div className="panel empty-state">
+          <Building2 className="empty-state-icon" strokeWidth={1.25} />
+          <p className="empty-state-text">No hay obras sociales registradas.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -103,16 +103,16 @@ export function SocialWorksPage() {
             const isOpen = expanded === sw.id;
             const activeItems = sw.nomenclator?.filter((n: any) => n.isActive) ?? [];
             return (
-              <div key={sw.id} className="card overflow-hidden">
+              <div key={sw.id} className="panel overflow-hidden">
                 <div
-                  className="flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-slate-50 transition-colors"
+                  className="flex items-center gap-4 px-4 py-4 cursor-pointer hover:bg-slate-50 transition-colors"
                   onClick={() => setExpanded(isOpen ? null : sw.id)}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center shrink-0">
-                    <Building2 size={18} className="text-teal-700" />
+                  <div className="w-10 h-10 bg-teal-100 border border-teal-200 flex items-center justify-center shrink-0">
+                    <Building2 size={18} className="text-teal-800" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-slate-800">{sw.name}</p>
+                    <p className="font-medium text-slate-800">{sw.name}</p>
                     <p className="text-xs text-slate-500">
                       {activeItems.length} prestaciones en nomenclador
                       {sw.contactEmail && ` · ${sw.contactEmail}`}
@@ -137,8 +137,8 @@ export function SocialWorksPage() {
                 {isOpen && (
                   <div className="border-t border-slate-100 px-5 py-4 space-y-4">
                     {/* Add item */}
-                    <div className="bg-slate-50 rounded-xl p-4">
-                      <p className="text-sm font-semibold text-slate-700 mb-3">Agregar prestación</p>
+                    <div className="bg-slate-50 border border-slate-200 p-4">
+                      <p className="text-sm font-medium text-slate-700 mb-3">Agregar prestación</p>
                       <div className="grid grid-cols-4 gap-2">
                         <div><label className="label">Código</label>
                           <input className="input font-mono" value={newItemForm[sw.id]?.code ?? ''}
@@ -158,12 +158,12 @@ export function SocialWorksPage() {
                     </div>
 
                     {/* Items table */}
-                    <div className="overflow-hidden border border-slate-200 rounded-xl">
+                    <div className="overflow-hidden border border-slate-200">
                       <table className="w-full text-sm">
                         <thead className="bg-slate-50">
                           <tr>
                             {['Código', 'Descripción', 'Valor', ''].map((h) => (
-                              <th key={h} className="text-left px-3 py-2.5 text-xs font-semibold text-slate-500 uppercase">{h}</th>
+                              <th key={h} className="text-left px-3 py-2 nav-section-label">{h}</th>
                             ))}
                           </tr>
                         </thead>

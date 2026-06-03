@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, User, Phone, Building2, ChevronRight } from 'lucide-react';
 import { patientsApi } from '@/api';
-import { calcAge, formatDate } from '@/lib/utils';
+import { calcAge } from '@/lib/utils';
 
 export function PatientsPage() {
   const [search, setSearch] = useState('');
@@ -18,10 +18,9 @@ export function PatientsPage() {
 
   return (
     <div className="space-y-5 animate-fade-in">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="page-title">Pacientes</h1>
+          <h1 className="page-heading">Pacientes</h1>
           <p className="text-slate-500 text-sm mt-0.5">
             {data?.total ?? '…'} pacientes registrados
           </p>
@@ -32,7 +31,6 @@ export function PatientsPage() {
         </button>
       </div>
 
-      {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
         <input
@@ -43,16 +41,15 @@ export function PatientsPage() {
         />
       </div>
 
-      {/* Table */}
-      <div className="card overflow-hidden">
+      <div className="panel overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200">
-              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Paciente</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">DNI</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Edad</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Contacto</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Obra Social</th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">Paciente</th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">DNI</th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">Edad</th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">Contacto</th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">Obra social</th>
               <th className="px-4 py-3" />
             </tr>
           </thead>
@@ -62,7 +59,7 @@ export function PatientsPage() {
                 <tr key={i}>
                   {Array.from({ length: 6 }).map((_, j) => (
                     <td key={j} className="px-4 py-3">
-                      <div className="h-4 bg-slate-100 rounded animate-pulse" />
+                      <div className="h-4 bg-slate-100 animate-pulse" />
                     </td>
                   ))}
                 </tr>
@@ -83,7 +80,7 @@ export function PatientsPage() {
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 text-xs font-bold shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 text-xs font-medium shrink-0">
                         {p.firstName[0]}{p.lastName[0]}
                       </div>
                       <div>
@@ -121,7 +118,6 @@ export function PatientsPage() {
           </tbody>
         </table>
 
-        {/* Pagination */}
         {data && data.totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
             <p className="text-xs text-slate-500">

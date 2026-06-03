@@ -39,8 +39,8 @@ services:
       - key: JWT_REFRESH_EXPIRES_IN
         value: 7d
       - key: CORS_ORIGIN
-        value: http://localhost:5173
+        value: https://TU-FRONT.vercel.app
       - key: CLINIC_NAME
         value: Mi Consultorio Odontológico
       - key: APP_URL
-        value: http://localhost:5173
+        value: https://TU-FRONT.vercel.app

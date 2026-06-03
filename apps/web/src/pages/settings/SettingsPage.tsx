@@ -83,17 +83,25 @@ export function SettingsPage() {
   return (
     <div className="space-y-5 animate-fade-in">
       <div>
-        <h1 className="page-title">Configuración</h1>
+        <h1 className="page-heading">Configuración</h1>
         <p className="text-slate-500 text-sm mt-0.5">Ajustes del consultorio y del sistema</p>
       </div>
 
-      <div className="flex gap-1 bg-slate-100 p-1 rounded-xl w-fit">
+      <div className="flex gap-0 border-b border-slate-200 w-fit flex-wrap">
         {TABS.map((t) => {
           const Icon = TAB_ICONS[t];
           return (
-            <button key={t} onClick={() => setActiveTab(t)}
-              className={cn('flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all',
-                activeTab === t ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700')}>
+            <button
+              key={t}
+              type="button"
+              onClick={() => setActiveTab(t)}
+              className={cn(
+                'flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
+                activeTab === t
+                  ? 'border-teal-600 text-slate-800'
+                  : 'border-transparent text-slate-500 hover:text-slate-700',
+              )}
+            >
               <Icon size={15} />
               {t}
             </button>
@@ -103,8 +111,8 @@ export function SettingsPage() {
 
       {/* Consultorio */}
       {activeTab === 'Consultorio' && (
-        <div className="card p-6">
-          <h2 className="section-title mb-2">Datos del consultorio</h2>
+        <div className="panel p-6">
+          <h2 className="section-heading mb-2">Datos del consultorio</h2>
           <p className="text-sm text-slate-400 mb-5">Estos datos aparecen en las facturas y notificaciones enviadas a pacientes.</p>
 
           <SettingRow label="Nombre del consultorio">
@@ -144,8 +152,8 @@ export function SettingsPage() {
 
       {/* Notificaciones */}
       {activeTab === 'Notificaciones' && (
-        <div className="card p-6">
-          <h2 className="section-title mb-2">Recordatorios automáticos</h2>
+        <div className="panel p-6">
+          <h2 className="section-heading mb-2">Recordatorios automáticos</h2>
           <p className="text-sm text-slate-400 mb-5">Configurá cuándo y cómo se envían los recordatorios de turno.</p>
 
           <SettingRow label="Recordatorio 48hs antes" description="Email + WhatsApp (si está activo)">
@@ -172,15 +180,15 @@ export function SettingsPage() {
               <span className="text-sm text-slate-700">Activado</span>
             </label>
           </SettingRow>
-          <div className="mt-6 p-4 bg-teal-50 border border-teal-200 rounded-xl">
+          <div className="mt-6 p-4 bg-teal-50 border border-teal-200">
             <p className="text-sm font-medium text-teal-800 mb-1">Envío de emails (Gmail)</p>
             <p className="text-xs text-teal-700">
-              Configurá <code className="font-mono bg-teal-100 px-1 rounded">GMAIL_USER</code> y{' '}
-              <code className="font-mono bg-teal-100 px-1 rounded">GMAIL_APP_PASSWORD</code> en{' '}
-              <code className="font-mono bg-teal-100 px-1 rounded">apps/api/.env</code>.
+              Configurá <code className="font-mono bg-teal-100 px-1">GMAIL_USER</code> y{' '}
+              <code className="font-mono bg-teal-100 px-1">GMAIL_APP_PASSWORD</code> en{' '}
+              <code className="font-mono bg-teal-100 px-1">apps/api/.env</code>.
               Para links de confirmación de turnos, agregá también{' '}
-              <code className="font-mono bg-teal-100 px-1 rounded">APP_URL</code> (ej.{' '}
-              <code className="font-mono bg-teal-100 px-1 rounded">http://localhost:5173</code>).
+              <code className="font-mono bg-teal-100 px-1">APP_URL</code> (ej.{' '}
+              <code className="font-mono bg-teal-100 px-1">http://localhost:5173</code>).
               Sin credenciales, los envíos se simulan y quedan en el historial.
             </p>
           </div>
@@ -196,26 +204,26 @@ export function SettingsPage() {
 
       {/* WhatsApp */}
       {activeTab === 'WhatsApp' && (
-        <div className="card p-6 space-y-4">
-          <h2 className="section-title mb-2">WhatsApp (Twilio)</h2>
+        <div className="panel p-6 space-y-4">
+          <h2 className="section-heading mb-2">WhatsApp (Twilio)</h2>
           <p className="text-sm text-slate-400 mb-4">
             Turnos y recordatorios por WhatsApp. Los documentos clínicos siguen enviándose solo por email.
           </p>
 
           <div className="grid sm:grid-cols-3 gap-3 mb-6">
-            <div className="rounded-lg border border-slate-200 p-4">
+            <div className="border border-slate-200 p-4">
               <p className="text-xs text-slate-500">Estado Twilio</p>
-              <p className={cn('text-sm font-semibold mt-1', waStatus?.configured ? 'text-emerald-700' : 'text-amber-700')}>
+              <p className={cn('text-sm font-medium mt-1', waStatus?.configured ? 'text-emerald-700' : 'text-amber-700')}>
                 {waStatus?.configured ? 'Conectado' : 'No configurado / simulado'}
               </p>
             </div>
-            <div className="rounded-lg border border-slate-200 p-4">
+            <div className="border border-slate-200 p-4">
               <p className="text-xs text-slate-500">Mensajes enviados</p>
-              <p className="text-lg font-semibold text-slate-900 mt-1">{waStatus?.sent ?? '—'}</p>
+              <p className="text-lg font-medium text-slate-900 mt-1">{waStatus?.sent ?? '—'}</p>
             </div>
-            <div className="rounded-lg border border-slate-200 p-4">
+            <div className="border border-slate-200 p-4">
               <p className="text-xs text-slate-500">Fallidos</p>
-              <p className="text-lg font-semibold text-red-600 mt-1">{waStatus?.failed ?? '—'}</p>
+              <p className="text-lg font-medium text-red-600 mt-1">{waStatus?.failed ?? '—'}</p>
             </div>
           </div>
 
@@ -260,13 +268,13 @@ export function SettingsPage() {
             </label>
           </SettingRow>
 
-          <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 space-y-2">
+          <div className="p-4 bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-2">
             <p>
               Los turnos se envían con <strong>botones</strong> Confirmar, Cancelar y Reprogramar.
               Al tocarlos, el estado del turno se actualiza en la agenda.
             </p>
             <p>
-              Variables en <code className="font-mono bg-white px-1 rounded">apps/api/.env</code>:{' '}
+              Variables en <code className="font-mono bg-white px-1">apps/api/.env</code>:{' '}
               <code className="font-mono">TWILIO_ACCOUNT_SID</code>,{' '}
               <code className="font-mono">TWILIO_AUTH_TOKEN</code>,{' '}
               <code className="font-mono">TWILIO_WHATSAPP_NUMBER</code>.
@@ -289,8 +297,8 @@ export function SettingsPage() {
 
       {/* Agenda */}
       {activeTab === 'Agenda' && (
-        <div className="card p-6">
-          <h2 className="section-title mb-2">Configuración de agenda</h2>
+        <div className="panel p-6">
+          <h2 className="section-heading mb-2">Configuración de agenda</h2>
           <p className="text-sm text-slate-400 mb-5">
             Define en qué días y horarios podés agendar turnos. La vista de Agenda usa solo esta ventana.
           </p>
@@ -329,7 +337,7 @@ export function SettingsPage() {
                     key={v}
                     type="button"
                     className={cn(
-                      'px-2.5 py-1 rounded-md text-xs font-medium border transition-colors',
+                      'px-2.5 py-1 text-xs font-medium border transition-colors',
                       on
                         ? 'bg-slate-800 text-white border-slate-800'
                         : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400',
@@ -359,14 +367,14 @@ export function SettingsPage() {
       {activeTab === 'Mi cuenta' && (
         <div className="space-y-4">
           {/* Profile */}
-          <div className="card p-6">
-            <h2 className="section-title mb-5">Datos del perfil</h2>
+          <div className="panel p-6">
+            <h2 className="section-heading mb-5">Datos del perfil</h2>
             <div className="flex items-center gap-4 mb-6 pb-5 border-b border-slate-100">
-              <div className="w-14 h-14 rounded-2xl bg-teal-100 flex items-center justify-center text-teal-700 text-xl font-bold">
+              <div className="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 text-xl font-medium">
                 {user?.firstName?.[0]}{user?.lastName?.[0]}
               </div>
               <div>
-                <p className="font-semibold text-slate-800">{user?.firstName} {user?.lastName}</p>
+                <p className="font-medium text-slate-800">{user?.firstName} {user?.lastName}</p>
                 <p className="text-sm text-slate-500">{user?.email}</p>
                 <p className="text-xs text-teal-600 font-medium mt-0.5">{user?.role}</p>
               </div>
@@ -406,8 +414,8 @@ export function SettingsPage() {
           </div>
 
           {/* Password */}
-          <div className="card p-6">
-            <h2 className="section-title mb-5 flex items-center gap-2">
+          <div className="panel p-6">
+            <h2 className="section-heading mb-5 flex items-center gap-2">
               <KeyRound size={18} className="text-slate-500" />
               Cambiar contraseña
             </h2>

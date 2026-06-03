@@ -64,8 +64,8 @@ export function BillingPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="page-title">Facturación</h1>
-          <p className="text-slate-500 text-sm mt-0.5">Gestión de ingresos y liquidaciones</p>
+          <h1 className="page-heading">Facturación</h1>
+          <p className="meta-label mt-1">Gestión de ingresos y liquidaciones</p>
         </div>
         <div className="flex gap-2">
           <button className="btn-secondary" onClick={() => setShowLiquidation(true)}>
@@ -88,9 +88,9 @@ export function BillingPage() {
             { label: 'Pendiente', value: summary.pending, color: 'bg-amber-500' },
             { label: 'OS pendiente', value: summary.socialWorkPending, color: 'bg-indigo-600' },
           ].map((c) => (
-            <div key={c.label} className="card p-4">
-              <p className="text-xs text-slate-500 font-medium mb-1">{c.label}</p>
-              <p className={cn('text-lg font-bold', c.color === 'bg-slate-800' ? 'text-slate-800' :
+            <div key={c.label} className="panel p-4">
+              <p className="meta-label mb-1">{c.label}</p>
+              <p className={cn('text-[26px] font-medium tabular-nums leading-tight', c.color === 'bg-slate-800' ? 'text-slate-800' :
                 c.color === 'bg-emerald-600' ? 'text-emerald-700' :
                 c.color === 'bg-amber-500' ? 'text-amber-700' : 'text-indigo-700')}>
                 {formatCurrency(c.value)}
@@ -101,7 +101,7 @@ export function BillingPage() {
       )}
 
       {/* Filters */}
-      <div className="card p-4">
+      <div className="panel p-4">
         <div className="flex flex-wrap gap-3 items-end">
           <div>
             <label className="label">Desde</label>
@@ -124,12 +124,12 @@ export function BillingPage() {
       </div>
 
       {/* Table */}
-      <div className="card overflow-hidden">
+      <div className="panel overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200">
               {['Nº', 'Paciente', 'Fecha', 'Método', 'Total', 'Pendiente', 'Estado', ''].map((h) => (
-                <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">{h}</th>
+                <th key={h} className="text-left px-4 py-3 nav-section-label">{h}</th>
               ))}
             </tr>
           </thead>
@@ -139,16 +139,16 @@ export function BillingPage() {
                 <tr key={i}>
                   {Array.from({ length: 8 }).map((_, j) => (
                     <td key={j} className="px-4 py-3">
-                      <div className="h-4 bg-slate-100 rounded animate-pulse" />
+                      <div className="h-4 bg-slate-100 animate-pulse" />
                     </td>
                   ))}
                 </tr>
               ))
             ) : data?.data?.length === 0 ? (
               <tr>
-                <td colSpan={8} className="text-center py-12 text-slate-400">
-                  <Receipt className="w-10 h-10 mx-auto mb-2 text-slate-200" />
-                  No hay facturas en este período
+                <td colSpan={8} className="empty-state py-12">
+                  <Receipt className="empty-state-icon" strokeWidth={1.25} />
+                  <p className="empty-state-text">No hay facturas en este período.</p>
                 </td>
               </tr>
             ) : data?.data?.map((inv: any) => {
@@ -169,7 +169,7 @@ export function BillingPage() {
                   <td className="px-4 py-3 text-slate-500 text-xs">
                     {PM_LABELS[inv.paymentMethod] ?? inv.paymentMethod}
                   </td>
-                  <td className="px-4 py-3 font-semibold text-slate-800">
+                  <td className="px-4 py-3 font-medium text-slate-800 tabular-nums">
                     {formatCurrency(inv.total)}
                   </td>
                   <td className="px-4 py-3">

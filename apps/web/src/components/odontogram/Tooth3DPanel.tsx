@@ -43,13 +43,11 @@ export function Tooth3DPanel({
     <div className="flex flex-col">
       <div className="flex items-start justify-between mb-3">
         <div>
-          <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
-            Modelo 3D
-          </span>
-          <div className="flex items-baseline gap-2">
-            <span className="text-xl font-black text-slate-800">Diente {toothNumber}</span>
+          <span className="nav-section-label text-slate-400">Modelo 3D</span>
+          <div className="flex items-baseline gap-2 mt-1">
+            <span className="section-heading">Diente {toothNumber}</span>
             {selectedSurface && (
-              <span className="text-sm font-semibold text-teal-700">
+              <span className="text-sm font-medium text-teal-800">
                 · Cara {SURFACE_SHORT[selectedSurface]}
               </span>
             )}
@@ -58,7 +56,7 @@ export function Tooth3DPanel({
         <div className="flex items-center gap-2">
           {record?.generalStatus && record.generalStatus !== ToothStatus.HEALTHY && (
             <span
-              className="badge text-xs"
+              className="badge text-micro"
               style={{
                 backgroundColor: TOOTH_STATUS_COLORS[record.generalStatus] + '22',
                 color: TOOTH_STATUS_COLORS[record.generalStatus],
@@ -89,23 +87,23 @@ export function Tooth3DPanel({
         onSurfaceHover={setHoveredSurface}
       />
 
-      <p className="text-[11px] text-slate-400 text-center mt-2 mb-3">
+      <p className="text-micro text-slate-400 text-center mt-2 mb-3">
         Clic en una cara del modelo · el formulario está debajo del odontograma
       </p>
 
-      <div className="border-t border-slate-100 pt-3">
+      <div className="border-t border-slate-200 pt-3">
         <div className="flex items-center gap-2 mb-2">
-          <ClipboardList size={14} className="text-teal-600" />
-          <span className="font-semibold text-sm text-slate-800">Historial del diente</span>
+          <ClipboardList size={14} className="text-teal-700" />
+          <span className="font-medium text-sm text-slate-800">Historial del diente</span>
         </div>
-        <div className="divide-y divide-slate-100 overflow-y-auto max-h-52 rounded-lg border border-slate-100 bg-slate-50/50">
+        <div className="divide-y divide-slate-100 overflow-y-auto max-h-52 border border-slate-200 bg-slate-50/50">
           {loadingInterventions ? (
             <div className="p-6 flex justify-center">
-              <div className="w-6 h-6 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-teal-700 border-t-transparent rounded-full animate-spin" />
             </div>
           ) : !interventions || interventions.length === 0 ? (
-            <div className="p-4 text-center text-slate-400 text-xs">
-              Sin intervenciones registradas
+            <div className="empty-state py-6">
+              <p className="empty-state-text">Sin intervenciones registradas en este diente.</p>
             </div>
           ) : (
             interventions.map(
@@ -118,14 +116,14 @@ export function Tooth3DPanel({
                 performedBy?: { lastName?: string };
                 createdAt: string;
               }) => (
-                <div key={rec.id} className="px-3 py-2.5 hover:bg-white/80 transition-colors">
+                <div key={rec.id} className="px-3 py-2 hover:bg-white/80 transition-colors">
                   <div className="flex items-start gap-2">
                     <span
                       className="w-2.5 h-2.5 rounded-full mt-0.5 shrink-0"
                       style={{ backgroundColor: TOOTH_STATUS_COLORS[rec.status] }}
                     />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-slate-800">
+                      <p className="text-micro font-medium text-slate-800">
                         {TOOTH_STATUS_LABELS[rec.status]}
                         {rec.surface && (
                           <span className="text-slate-500 font-normal">
@@ -135,16 +133,16 @@ export function Tooth3DPanel({
                         )}
                       </p>
                       {rec.material && (
-                        <p className="text-[11px] text-slate-500 mt-0.5">Material: {rec.material}</p>
+                        <p className="text-micro text-slate-500 mt-0.5">Material: {rec.material}</p>
                       )}
                       {rec.notes && (
-                        <p className="text-[11px] text-slate-500 mt-0.5 italic">{rec.notes}</p>
+                        <p className="text-micro text-slate-500 mt-0.5 italic">{rec.notes}</p>
                       )}
                       <div className="flex items-center justify-between mt-1 gap-2">
-                        <p className="text-[10px] text-slate-400">
+                        <p className="text-micro text-slate-400">
                           Dr. {rec.performedBy?.lastName ?? '—'}
                         </p>
-                        <p className="text-[10px] text-slate-400 shrink-0">
+                        <p className="text-micro text-slate-400 shrink-0">
                           {formatDateTime(rec.createdAt)}
                         </p>
                       </div>

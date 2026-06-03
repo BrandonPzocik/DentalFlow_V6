@@ -83,7 +83,7 @@ export function ToothTreatmentForm({
   return (
     <div className="space-y-3">
       <div>
-        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+        <p className="nav-section-label mb-1.5">
           ¿Dónde registrar?
         </p>
         <div className="flex flex-wrap gap-1">
@@ -91,7 +91,7 @@ export function ToothTreatmentForm({
             type="button"
             onClick={() => onSurfaceChange(null)}
             className={cn(
-              'px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all',
+              'px-2.5 py-1.5 text-xs font-medium border transition-all',
               selectedSurface === null
                 ? 'border-teal-500 bg-teal-50 text-teal-800'
                 : 'border-slate-200 text-slate-600 hover:border-slate-300',
@@ -107,7 +107,7 @@ export function ToothTreatmentForm({
                 type="button"
                 onClick={() => onSurfaceChange(s)}
                 className={cn(
-                  'px-2.5 py-1.5 rounded-lg text-xs font-bold border transition-all min-w-[2rem]',
+                  'px-2.5 py-1.5 text-xs font-medium border transition-all min-w-[2rem]',
                   selectedSurface === s
                     ? 'border-teal-500 bg-teal-50 text-teal-800'
                     : 'border-slate-200 text-slate-600 hover:border-slate-300',
@@ -142,7 +142,7 @@ export function ToothTreatmentForm({
               type="button"
               onClick={() => setStatus(s)}
               className={cn(
-                'flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-medium border transition-all text-left',
+                'flex items-center gap-2 px-2 py-1.5 text-xs font-medium border transition-all text-left',
                 status === s
                   ? 'border-teal-500 bg-teal-50 text-teal-700'
                   : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300',

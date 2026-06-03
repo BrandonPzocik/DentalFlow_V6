@@ -63,19 +63,19 @@ export function InvoiceDetailModal({ invoice, onClose, onUpdate }: Props) {
   const canEmail = !!invoice.patient?.email && invoice.patient?.acceptsEmail !== false;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg animate-slide-up">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="modal-shell w-full max-w-lg">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
           <div>
-            <h2 className="font-semibold text-slate-800">{invoice.number}</h2>
+            <h2 className="section-heading">{invoice.number}</h2>
             <span className={cn('badge text-xs', st.bg, st.text)}>{st.label}</span>
           </div>
-          <button className="p-1.5 hover:bg-slate-100 rounded-lg" onClick={onClose}><X size={18} /></button>
+          <button className="p-1.5 hover:bg-slate-100 border border-transparent" onClick={onClose}><X size={18} /></button>
         </div>
 
         <div className="p-6 space-y-4 max-h-[65vh] overflow-y-auto">
-          <div className="bg-slate-50 rounded-xl p-4">
-            <p className="font-semibold text-slate-800">
+          <div className="bg-slate-50 border border-slate-200 p-4">
+            <p className="font-medium text-slate-800">
               {invoice.patient?.lastName}, {invoice.patient?.firstName}
             </p>
             <p className="text-sm text-slate-500 mt-0.5">
@@ -92,8 +92,8 @@ export function InvoiceDetailModal({ invoice, onClose, onUpdate }: Props) {
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-slate-700 mb-2">Prestaciones</p>
-            <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
+            <p className="text-sm font-medium text-slate-700 mb-2">Prestaciones</p>
+            <div className="divide-y divide-slate-100 border border-slate-200 overflow-hidden">
               {invoice.items?.map((item: any) => (
                 <div key={item.id} className="flex items-center justify-between px-4 py-3 bg-white">
                   <div>
@@ -106,7 +106,7 @@ export function InvoiceDetailModal({ invoice, onClose, onUpdate }: Props) {
                     )}
                   </div>
                   <div className="text-right shrink-0 ml-4">
-                    <p className="text-sm font-semibold text-slate-800">{formatCurrency(item.total)}</p>
+                    <p className="text-sm font-medium text-slate-800">{formatCurrency(item.total)}</p>
                     {item.quantity > 1 && (
                       <p className="text-xs text-slate-400">{item.quantity} × {formatCurrency(item.unitPrice)}</p>
                     )}
@@ -116,7 +116,7 @@ export function InvoiceDetailModal({ invoice, onClose, onUpdate }: Props) {
             </div>
           </div>
 
-          <div className="bg-slate-50 rounded-xl p-4 space-y-1.5">
+          <div className="bg-slate-50 border border-slate-200 p-4 space-y-1.5">
             <div className="flex justify-between text-sm text-slate-500">
               <span>Subtotal</span><span>{formatCurrency(invoice.subtotal)}</span>
             </div>
@@ -126,7 +126,7 @@ export function InvoiceDetailModal({ invoice, onClose, onUpdate }: Props) {
                 <span>- {formatCurrency(invoice.discountAmount)}</span>
               </div>
             )}
-            <div className="flex justify-between font-bold text-slate-800 pt-1.5 border-t border-slate-200">
+            <div className="flex justify-between font-medium text-slate-800 pt-1.5 border-t border-slate-200">
               <span>Total</span><span className="text-teal-700">{formatCurrency(invoice.total)}</span>
             </div>
             {Number(invoice.pendingAmount) > 0 && (
@@ -141,7 +141,7 @@ export function InvoiceDetailModal({ invoice, onClose, onUpdate }: Props) {
           )}
         </div>
 
-        <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 rounded-b-2xl flex flex-wrap gap-2">
+        <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 flex flex-wrap gap-2">
           <button
             className="btn-secondary btn-sm text-teal-600 border-teal-200 hover:bg-teal-50"
             disabled={!canEmail || emailMut.isPending}

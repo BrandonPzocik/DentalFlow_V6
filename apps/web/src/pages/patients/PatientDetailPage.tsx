@@ -16,9 +16,9 @@ import { EditPatientModal } from '@/components/patients/EditPatientModal';
 import { StudiesPanel } from '@/components/studies/StudiesPanel';
 import { PrescriptionsPanel } from '@/components/prescriptions/PrescriptionsPanel';
 import { generateOdontogramPdf } from '@/lib/odontogramPdf';
-import { calcAge } from '@/lib/utils';
-import { APPOINTMENT_STATUS_COLORS, APPOINTMENT_STATUS_LABELS, AppointmentStatus } from '@dentaflow/shared';
-import { cn } from '@/lib/utils';
+import { calcAge, cn } from '@/lib/utils';
+import { AppointmentStatus } from '@dentaflow/shared';
+import { AppointmentStatusBadge } from '@/components/ui/AppointmentStatusBadge';
 
 const TABS = ['Odontograma', 'Estudios', 'Recetario', 'Turnos', 'Historia clínica'] as const;
 type Tab = typeof TABS[number];
@@ -81,16 +81,15 @@ export function PatientDetailPage() {
         <ArrowLeft size={16} /> Volver a pacientes
       </button>
 
-      {/* Patient header card */}
-      <div className="card p-5">
+      <div className="panel p-5">
         <div className="flex items-start gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-teal-100 flex items-center justify-center text-teal-700 text-xl font-bold shrink-0">
+          <div className="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 text-xl font-medium shrink-0">
             {patient.firstName[0]}{patient.lastName[0]}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h1 className="text-xl font-bold text-slate-800">
+                <h1 className="text-xl font-medium text-slate-800">
                   {patient.lastName}, {patient.firstName}
                 </h1>
                 <p className="text-slate-500 text-sm mt-0.5 font-mono">
@@ -102,7 +101,7 @@ export function PatientDetailPage() {
                   <Edit size={14} /> Editar
                 </button>
                 <button
-                  className="btn-sm flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-red-500 border border-red-200 hover:bg-red-50 transition-colors text-xs font-medium"
+                  className="btn-danger btn-sm"
                   onClick={() => setShowDeleteConfirm(true)}
                 >
                   <Trash2 size={14} /> Eliminar
@@ -135,7 +134,7 @@ export function PatientDetailPage() {
               {patient.bloodType && (
                 <div className="flex items-center gap-1.5 text-sm">
                   <Droplets size={13} className="text-red-400" />
-                  <span className="font-mono font-bold text-red-600">{patient.bloodType}</span>
+                  <span className="font-mono font-medium text-red-600">{patient.bloodType}</span>
                 </div>
               )}
             </div>
@@ -143,18 +142,18 @@ export function PatientDetailPage() {
             {(patient.hasAllergies || patient.systemicDiseases || patient.isPregnant || patient.isBruxist) && (
               <div className="flex flex-wrap gap-2 mt-3">
                 {patient.hasAllergies && (
-                  <span className="badge bg-red-100 text-red-700 flex items-center gap-1">
+                  <span className="badge-pill bg-red-100 text-red-700 flex items-center gap-1">
                     <AlertTriangle size={11} /> Alergias: {patient.allergiesDetail ?? 'ver ficha'}
                   </span>
                 )}
                 {patient.systemicDiseases && (
-                  <span className="badge bg-amber-100 text-amber-700">{patient.systemicDiseases}</span>
+                  <span className="badge-pill bg-amber-100 text-amber-700">{patient.systemicDiseases}</span>
                 )}
                 {patient.isPregnant && (
-                  <span className="badge bg-pink-100 text-pink-700">Embarazada</span>
+                  <span className="badge-pill bg-pink-100 text-pink-700">Embarazada</span>
                 )}
                 {patient.isBruxist && (
-                  <span className="badge bg-indigo-100 text-indigo-700">Bruxismo</span>
+                  <span className="badge-pill bg-indigo-100 text-indigo-700">Bruxismo</span>
                 )}
               </div>
             )}
@@ -162,15 +161,17 @@ export function PatientDetailPage() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 bg-slate-100 p-1 rounded-xl w-fit flex-wrap">
+      <div className="flex gap-0 border-b border-slate-200 w-fit flex-wrap">
         {TABS.map((t) => (
           <button
             key={t}
+            type="button"
             onClick={() => setTab(t)}
             className={cn(
-              'px-4 py-2 rounded-lg text-sm font-medium transition-all',
-              tab === t ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700',
+              'px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
+              tab === t
+                ? 'border-teal-600 text-slate-800'
+                : 'border-transparent text-slate-500 hover:text-slate-700',
             )}
           >
             {t}
@@ -203,7 +204,7 @@ export function PatientDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
             <div className="lg:col-span-7 space-y-4">
               {loadingOdonto ? (
-                <div className="card p-8 flex justify-center">
+                <div className="panel p-8 flex justify-center">
                   <div className="w-8 h-8 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : odontogram ? (
@@ -230,7 +231,7 @@ export function PatientDetailPage() {
 
             <div className="lg:col-span-5">
               {toothSelection && odontogram ? (
-                <div className="card p-4 lg:sticky lg:top-4">
+                <div className="panel p-4 lg:sticky lg:top-4">
                   <Suspense
                     fallback={
                       <div className="flex flex-col items-center justify-center py-16 gap-3">
@@ -255,7 +256,7 @@ export function PatientDetailPage() {
                   </Suspense>
                 </div>
               ) : (
-                <div className="card p-6 text-center h-full min-h-[16rem] flex flex-col items-center justify-center">
+                <div className="panel p-6 text-center h-full min-h-[16rem] flex flex-col items-center justify-center">
                   <div className="text-4xl mb-2">🦷</div>
                   <p className="text-sm text-slate-600 font-medium">Panel de prestaciones</p>
                   <p className="text-xs text-slate-400 mt-1 max-w-xs">
@@ -280,44 +281,36 @@ export function PatientDetailPage() {
 
       {/* ── APPOINTMENTS TAB ── */}
       {tab === 'Turnos' && (
-        <div className="card divide-y divide-slate-100">
+        <div className="panel divide-y divide-slate-100">
           {!appointments || appointments.length === 0 ? (
             <div className="p-10 text-center text-slate-400">
               <Calendar className="w-10 h-10 mx-auto mb-2 text-slate-300" />
               No hay turnos registrados
             </div>
           ) : (
-            appointments.map((apt: any) => {
-              const color = APPOINTMENT_STATUS_COLORS[apt.status as AppointmentStatus];
-              return (
-                <div key={apt.id} className="px-5 py-4 flex items-center gap-4">
-                  <div className="text-center w-20 shrink-0">
-                    <p className="text-sm font-semibold text-slate-700">
-                      {new Date(apt.scheduledAt).toLocaleDateString('es-AR')}
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      {new Date(apt.scheduledAt).toLocaleTimeString('es-AR', {
-                        hour: '2-digit', minute: '2-digit',
-                      })}
-                    </p>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-800">
-                      {apt.treatmentType ?? 'Consulta general'}
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      Dr. {apt.dentist?.lastName} · {apt.durationMinutes} min
-                    </p>
-                  </div>
-                  <span
-                    className="badge shrink-0 text-xs"
-                    style={{ backgroundColor: color + '22', color }}
-                  >
-                    {APPOINTMENT_STATUS_LABELS[apt.status as AppointmentStatus]}
-                  </span>
+            appointments.map((apt: any) => (
+              <div key={apt.id} className="px-5 py-4 flex items-center gap-4">
+                <div className="text-center w-20 shrink-0">
+                  <p className="text-sm font-medium text-slate-700">
+                    {new Date(apt.scheduledAt).toLocaleDateString('es-AR')}
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    {new Date(apt.scheduledAt).toLocaleTimeString('es-AR', {
+                      hour: '2-digit', minute: '2-digit',
+                    })}
+                  </p>
                 </div>
-              );
-            })
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-slate-800">
+                    {apt.treatmentType ?? 'Consulta general'}
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    Dr. {apt.dentist?.lastName} · {apt.durationMinutes} min
+                  </p>
+                </div>
+                <AppointmentStatusBadge status={apt.status as AppointmentStatus} className="shrink-0" />
+              </div>
+            ))
           )}
         </div>
       )}
@@ -325,8 +318,8 @@ export function PatientDetailPage() {
       {/* ── CLINICAL HISTORY TAB ── */}
       {tab === 'Historia clínica' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="card p-5 space-y-3">
-            <h3 className="section-title">Datos médicos</h3>
+          <div className="panel p-5 space-y-3">
+            <h3 className="section-heading">Datos médicos</h3>
             <Row label="Grupo sanguíneo" value={patient.bloodType ?? '—'} />
             <Row label="Alergias" value={patient.hasAllergies ? (patient.allergiesDetail ?? 'Sí') : 'No'} alert={patient.hasAllergies} />
             <Row label="Medicación actual" value={patient.currentMedication ?? '—'} />
@@ -334,8 +327,8 @@ export function PatientDetailPage() {
             <Row label="Embarazada" value={patient.isPregnant ? 'Sí' : 'No'} />
             <Row label="Bruxismo" value={patient.isBruxist ? 'Sí' : 'No'} />
           </div>
-          <div className="card p-5 space-y-3">
-            <h3 className="section-title">Cobertura y contacto</h3>
+          <div className="panel p-5 space-y-3">
+            <h3 className="section-heading">Cobertura y contacto</h3>
             <Row label="Obra social" value={patient.socialWork ?? 'Particular'} />
             <Row label="Nº afiliado" value={patient.affiliateNumber ?? '—'} mono />
             <Row label="Plan" value={patient.plan ?? '—'} />
@@ -343,8 +336,8 @@ export function PatientDetailPage() {
             <Row label="Email (documentos)" value={patient.acceptsEmail ? 'Sí' : 'No'} />
           </div>
           {patient.medicalNotes && (
-            <div className="card p-5 md:col-span-2">
-              <h3 className="section-title mb-2">Notas médicas</h3>
+            <div className="panel p-5 md:col-span-2">
+              <h3 className="section-heading mb-2">Notas médicas</h3>
               <p className="text-sm text-slate-600 whitespace-pre-wrap">{patient.medicalNotes}</p>
             </div>
           )}
@@ -359,11 +352,11 @@ export function PatientDetailPage() {
       {/* Delete confirm */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-slide-up">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-slide-up">
             <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
               <Trash2 size={22} className="text-red-500" />
             </div>
-            <h2 className="text-lg font-bold text-slate-800 text-center mb-2">¿Eliminar paciente?</h2>
+            <h2 className="text-lg font-medium text-slate-800 text-center mb-2">¿Eliminar paciente?</h2>
             <p className="text-sm text-slate-500 text-center mb-6">
               Vas a desactivar la ficha de <strong>{patient.firstName} {patient.lastName}</strong>.
               El historial clínico se conserva por razones legales.
@@ -373,7 +366,7 @@ export function PatientDetailPage() {
                 Cancelar
               </button>
               <button
-                className="flex-1 btn bg-red-500 text-white hover:bg-red-600 focus:ring-red-400"
+                className="btn-danger flex-1"
                 onClick={() => deleteMutation.mutate()}
                 disabled={deleteMutation.isPending}
               >

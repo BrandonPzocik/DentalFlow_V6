@@ -89,9 +89,9 @@ export function appointmentInSlot(
 }
 
 export function slotRowHeight(slotMinutes: number): number {
-  if (slotMinutes <= 15) return 56;
-  if (slotMinutes <= 30) return 76;
-  return 92;
+  if (slotMinutes <= 15) return 52;
+  if (slotMinutes <= 30) return 52;
+  return 72;
 }
 
 export function datetimeLocalBounds(date: Date, schedule: AgendaSchedule): { min: string; max: string } {

@@ -45,22 +45,20 @@ export function NewPatientPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
-      {/* Header */}
       <div className="flex items-center gap-4">
         <button className="btn-ghost btn-sm" onClick={() => navigate('/patients')}>
           <ArrowLeft size={16} />
           Volver
         </button>
         <div>
-          <h1 className="page-title">Nuevo paciente</h1>
+          <h1 className="page-heading">Nuevo paciente</h1>
           <p className="text-slate-500 text-sm">Completá la ficha clínica</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Datos personales */}
-        <div className="card p-5 space-y-4">
-          <h2 className="section-title">Datos personales</h2>
+        <div className="panel p-5 space-y-4">
+          <h2 className="section-heading">Datos personales</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="label">Nombre *</label>
@@ -101,9 +99,8 @@ export function NewPatientPage() {
           </div>
         </div>
 
-        {/* Obra social */}
-        <div className="card p-5 space-y-4">
-          <h2 className="section-title">Cobertura médica</h2>
+        <div className="panel p-5 space-y-4">
+          <h2 className="section-heading">Cobertura médica</h2>
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="label">Obra social</label>
@@ -125,9 +122,8 @@ export function NewPatientPage() {
           </div>
         </div>
 
-        {/* Datos médicos */}
-        <div className="card p-5 space-y-4">
-          <h2 className="section-title">Antecedentes médicos</h2>
+        <div className="panel p-5 space-y-4">
+          <h2 className="section-heading">Antecedentes médicos</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="label">Grupo sanguíneo</label>
@@ -140,11 +136,11 @@ export function NewPatientPage() {
             </div>
             <div className="flex flex-col gap-3 pt-5">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="rounded text-teal-600" checked={form.hasAllergies} onChange={(e) => set('hasAllergies', e.target.checked)} />
+                <input type="checkbox" className="text-teal-600" checked={form.hasAllergies} onChange={(e) => set('hasAllergies', e.target.checked)} />
                 <span className="text-sm text-slate-700">Tiene alergias</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="rounded text-teal-600" checked={form.isBruxist} onChange={(e) => set('isBruxist', e.target.checked)} />
+                <input type="checkbox" className="text-teal-600" checked={form.isBruxist} onChange={(e) => set('isBruxist', e.target.checked)} />
                 <span className="text-sm text-slate-700">Bruxismo</span>
               </label>
             </div>
@@ -169,27 +165,24 @@ export function NewPatientPage() {
           </div>
         </div>
 
-        {/* Notificaciones */}
-        <div className="card p-5 space-y-3">
-          <h2 className="section-title">Notificaciones</h2>
+        <div className="panel p-5 space-y-3">
+          <h2 className="section-heading">Notificaciones</h2>
           <label className="flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" className="rounded text-teal-600" checked={form.acceptsWhatsapp} onChange={(e) => set('acceptsWhatsapp', e.target.checked)} />
+            <input type="checkbox" className="text-teal-600" checked={form.acceptsWhatsapp} onChange={(e) => set('acceptsWhatsapp', e.target.checked)} />
             <span className="text-sm text-slate-700">Acepta turnos y recordatorios por WhatsApp</span>
           </label>
           <label className="flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" className="rounded text-teal-600" checked={form.acceptsEmail} onChange={(e) => set('acceptsEmail', e.target.checked)} />
+            <input type="checkbox" className="text-teal-600" checked={form.acceptsEmail} onChange={(e) => set('acceptsEmail', e.target.checked)} />
             <span className="text-sm text-slate-700">Acepta documentos clínicos por email</span>
           </label>
         </div>
 
-        {/* Error */}
         {mutation.isError && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
             {(mutation.error as any)?.response?.data?.message ?? 'Error al guardar el paciente'}
           </div>
         )}
 
-        {/* Submit */}
         <div className="flex justify-end gap-3 pb-6">
           <button type="button" className="btn-secondary" onClick={() => navigate('/patients')}>
             Cancelar

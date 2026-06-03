@@ -67,7 +67,7 @@ export function NotificationsPage() {
     <div className="space-y-5 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="page-title">Notificaciones por email</h1>
+          <h1 className="page-heading">Notificaciones por email</h1>
           <p className="text-slate-500 text-sm mt-0.5">Historial de correos enviados a pacientes</p>
         </div>
         <div className="flex gap-2">
@@ -86,24 +86,24 @@ export function NotificationsPage() {
           { label: 'Exitosos', value: stats.sent, color: 'text-emerald-700' },
           { label: 'Fallidos', value: stats.failed, color: 'text-red-600' },
         ].map((s) => (
-          <div key={s.label} className="card p-4 text-center">
-            <p className={cn('text-2xl font-bold', s.color)}>{s.value}</p>
+          <div key={s.label} className="panel p-4 text-center">
+            <p className={cn('text-2xl font-medium', s.color)}>{s.value}</p>
             <p className="text-xs text-slate-500 mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
 
       {showCompose && (
-        <div className="card p-5 border-teal-200 animate-slide-up">
+        <div className="panel p-5 border-teal-200 animate-slide-up">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="section-title">Nuevo email</h3>
+            <h3 className="section-heading">Nuevo email</h3>
             <button className="btn-ghost btn-sm" onClick={() => setShowCompose(false)}>✕</button>
           </div>
           <div className="space-y-4">
             <div>
               <label className="label">Paciente *</label>
               {selectedPatient ? (
-                <div className="flex items-center justify-between bg-teal-50 border border-teal-200 rounded-xl px-4 py-2.5">
+                <div className="flex items-center justify-between bg-teal-50 border border-teal-200 px-4 py-2.5">
                   <div>
                     <p className="font-medium text-teal-800 text-sm">
                       {selectedPatient.lastName}, {selectedPatient.firstName}
@@ -122,7 +122,7 @@ export function NotificationsPage() {
                     onChange={(e) => setPatientSearch(e.target.value)}
                   />
                   {searchResults && searchResults.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-10">
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 shadow-lg z-10">
                       {(searchResults as any[]).map((p: any) => (
                         <button
                           key={p.id}
@@ -184,7 +184,7 @@ export function NotificationsPage() {
         </div>
       )}
 
-      <div className="card divide-y divide-slate-100">
+      <div className="panel divide-y divide-slate-100">
         {isLoading ? (
           <div className="p-8 text-center text-slate-400">Cargando…</div>
         ) : (logs as any[]).length === 0 ? (
@@ -198,13 +198,13 @@ export function NotificationsPage() {
             const StIcon = st.icon;
             return (
               <div key={log.id} className="px-5 py-4 flex items-start gap-4 hover:bg-slate-50">
-                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                   <Mail size={16} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
-                    <p className="text-sm font-semibold text-slate-800 truncate">{log.subject}</p>
-                    <span className="badge bg-slate-100 text-slate-500 shrink-0">
+                    <p className="text-sm font-medium text-slate-800 truncate">{log.subject}</p>
+                    <span className="badge-pill bg-slate-100 text-slate-500 shrink-0">
                       {TYPE_LABELS[log.type] ?? log.type}
                     </span>
                   </div>

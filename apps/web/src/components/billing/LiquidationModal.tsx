@@ -325,16 +325,16 @@ export function LiquidationModal({ onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl animate-slide-up">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="modal-shell w-full max-w-3xl">
 
         {/* Modal header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
           <div className="flex items-center gap-2">
             <FileText size={20} className="text-teal-600" />
-            <h2 className="font-semibold text-slate-800 text-lg">Liquidación de Obra Social</h2>
+            <h2 className="section-heading">Liquidación de Obra Social</h2>
           </div>
-          <button className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors" onClick={onClose}>
+          <button className="p-1.5 hover:bg-slate-100 border border-transparent transition-colors" onClick={onClose}>
             <X size={18} className="text-slate-500" />
           </button>
         </div>
@@ -366,7 +366,7 @@ export function LiquidationModal({ onClose }: Props) {
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <p className="font-semibold text-slate-800">{sw?.name}</p>
+                  <p className="font-medium text-slate-800">{sw?.name}</p>
                   <p className="text-sm text-slate-500">
                     {from.split('-').reverse().join('/')} al {to.split('-').reverse().join('/')} ·{' '}
                     {isLoading ? '…' : `${(liquidation as any[])?.length ?? 0} prestaciones`}
@@ -383,13 +383,13 @@ export function LiquidationModal({ onClose }: Props) {
               </div>
 
               {/* Preview table */}
-              <div className="border border-slate-200 rounded-xl overflow-hidden">
+              <div className="border border-slate-200 overflow-hidden">
                 <div className="max-h-64 overflow-y-auto">
                   <table className="w-full text-sm">
                     <thead className="bg-teal-600 sticky top-0">
                       <tr>
                         {['Paciente', 'Afiliado', 'Plan', 'Fecha', 'Prestaciones', 'Total'].map((h) => (
-                          <th key={h} className="text-left px-3 py-2.5 text-xs font-semibold text-white uppercase tracking-wide">
+                          <th key={h} className="text-left px-3 py-2.5 nav-section-label text-white">
                             {h}
                           </th>
                         ))}
@@ -434,7 +434,7 @@ export function LiquidationModal({ onClose }: Props) {
                               </div>
                             ))}
                           </td>
-                          <td className="px-3 py-2.5 font-semibold text-teal-700 text-right whitespace-nowrap">
+                          <td className="px-3 py-2.5 font-medium text-teal-700 text-right whitespace-nowrap">
                             {fmt(inv.total)}
                           </td>
                         </tr>
@@ -445,8 +445,8 @@ export function LiquidationModal({ onClose }: Props) {
 
                 {/* Total row */}
                 <div className="flex items-center justify-between px-4 py-3 bg-teal-600">
-                  <span className="text-sm font-semibold text-white">Total a liquidar</span>
-                  <span className="text-lg font-bold text-white">{fmt(total)}</span>
+                  <span className="text-sm font-medium text-white">Total a liquidar</span>
+                  <span className="text-lg font-medium text-white">{fmt(total)}</span>
                 </div>
               </div>
 
@@ -458,7 +458,7 @@ export function LiquidationModal({ onClose }: Props) {
           )}
         </div>
 
-        <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 rounded-b-2xl flex justify-end">
+        <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end">
           <button className="btn-secondary" onClick={onClose}>Cerrar</button>
         </div>
       </div>

@@ -80,17 +80,17 @@ export function NewAppointmentModal({ initialDate, schedule, onClose, onSuccess 
     setForm((f) => ({ ...f, [field]: value }));
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md animate-slide-up border border-slate-200">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200">
-          <h2 className="font-semibold text-slate-900">Nuevo turno</h2>
-          <button className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="modal-shell w-full max-w-md">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
+          <h2 className="section-heading">Nuevo turno</h2>
+          <button type="button" className="p-1.5 hover:bg-slate-100 border border-transparent" onClick={onClose}>
             <X size={18} className="text-slate-500" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-5 space-y-4">
-          <p className="text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+        <form onSubmit={handleSubmit} className="p-4 space-y-4">
+          <p className="meta-label bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
             Horario permitido: {schedule.startTime} a {schedule.endTime}
           </p>
 
@@ -102,7 +102,7 @@ export function NewAppointmentModal({ initialDate, schedule, onClose, onSuccess 
                   <p className="text-sm font-medium text-slate-900">
                     {selectedPatient.lastName}, {selectedPatient.firstName}
                   </p>
-                  <p className="text-xs text-slate-500">DNI {selectedPatient.dni}</p>
+                  <p className="meta-label">DNI {selectedPatient.dni}</p>
                 </div>
                 <button type="button" className="text-slate-400 hover:text-slate-600" onClick={() => setSelectedPatient(null)}>
                   <X size={16} />
@@ -123,11 +123,11 @@ export function NewAppointmentModal({ initialDate, schedule, onClose, onSuccess 
                       <button
                         key={p.id}
                         type="button"
-                        className="w-full text-left px-3 py-2.5 hover:bg-slate-50 border-b border-slate-100 last:border-b-0"
+                        className="w-full text-left px-3 py-2 hover:bg-slate-50 border-b border-slate-100 last:border-b-0"
                         onClick={() => { setSelectedPatient(p); setPatientSearch(''); }}
                       >
                         <p className="text-sm font-medium text-slate-800">{p.lastName}, {p.firstName}</p>
-                        <p className="text-xs text-slate-500">DNI {p.dni}</p>
+                        <p className="meta-label">DNI {p.dni}</p>
                       </button>
                     ))}
                   </div>
@@ -148,10 +148,10 @@ export function NewAppointmentModal({ initialDate, schedule, onClose, onSuccess 
               required
             />
             {!dayOk && form.scheduledAt && (
-              <p className="text-xs text-amber-700 mt-1">Este día no está dentro de tu agenda laboral.</p>
+              <p className="text-micro text-amber-800 mt-1">Este día no está dentro de tu agenda laboral.</p>
             )}
             {isPast && form.scheduledAt && (
-              <p className="text-xs text-red-600 mt-1">Elegí una fecha y hora futura.</p>
+              <p className="text-micro text-red-700 mt-1">Elegí una fecha y hora futura.</p>
             )}
           </div>
 
@@ -176,7 +176,7 @@ export function NewAppointmentModal({ initialDate, schedule, onClose, onSuccess 
               className="input"
               value={form.treatmentType}
               onChange={(e) => set('treatmentType', e.target.value)}
-              placeholder="Obturación, Limpieza…"
+              placeholder="Obturación, limpieza…"
             />
           </div>
 
@@ -193,11 +193,11 @@ export function NewAppointmentModal({ initialDate, schedule, onClose, onSuccess 
 
           <div>
             <label className="label">Notas</label>
-            <textarea className="input resize-none h-16 text-xs" value={form.notes} onChange={(e) => set('notes', e.target.value)} />
+            <textarea className="input resize-none h-16 text-micro" value={form.notes} onChange={(e) => set('notes', e.target.value)} />
           </div>
 
           {mutation.isError && (
-            <p className="text-xs text-red-600">
+            <p className="text-micro text-red-700">
               {(mutation.error as any)?.response?.data?.message ?? 'Error al crear el turno'}
             </p>
           )}

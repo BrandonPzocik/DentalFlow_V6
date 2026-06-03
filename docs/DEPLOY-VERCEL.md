@@ -37,7 +37,7 @@ Más adelante, cada consultorio puede usar **su propio dominio** (ej. `agenda.dr
 |--------|--------|
 | **Framework Preset** | Vite (o Other si no detecta) |
 | **Root Directory** | `.` (raíz del monorepo) |
-| **Build Command** | `pnpm run build:vercel` (no uses `pnpm run build` — eso compila la API y falla) |
+| **Build Command** | `pnpm -w run build:vercel` (no uses `pnpm run build` — eso compila la API y falla). Si Root Directory es `apps/web`, el `-w` es obligatorio. |
 | **Output Directory** | `apps/web/dist` |
 | **Install Command** | `NODE_ENV=development pnpm install --frozen-lockfile` |
 
@@ -172,7 +172,8 @@ VITE_API_URL=https://dentaflow-api-s3u3.onrender.com/api
 
 | Problema | Solución |
 |----------|----------|
-| `Cannot find module '@dentaflow/shared'` | Build = **`pnpm run build:vercel`**, no `pnpm run build`. Root = repo completo, no solo `apps/web`. |
+| `Cannot find module '@dentaflow/shared'` | Build = **`pnpm -w run build:vercel`**, no `pnpm run build`. Root = repo completo, no solo `apps/web`. |
+| `Missing script: build:vercel` | Root Directory = `apps/web` en Vercel. Usá **`pnpm -w run build:vercel`** o dejá que `apps/web/vercel.json` lo configure. |
 | Logs muestran `users.controller.ts` / API | Vercel está compilando el backend; solo debe correr `build:vercel` (shared + web). |
 | Override en Vercel | Desactivá overrides de Build/Install o copiá los valores de la tabla de arriba. |
 

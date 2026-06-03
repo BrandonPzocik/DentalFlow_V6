@@ -38,7 +38,7 @@ Más adelante, cada consultorio puede usar **su propio dominio** (ej. `agenda.dr
 | **Framework Preset** | Vite (o Other si no detecta) |
 | **Root Directory** | `.` (raíz del monorepo) |
 | **Build Command** | `pnpm -w run build:vercel` (no uses `pnpm run build` — eso compila la API y falla). Si Root Directory es `apps/web`, el `-w` es obligatorio. |
-| **Output Directory** | `apps/web/dist` |
+| **Output Directory** | `dist` (el script `build:vercel` copia `apps/web/dist` → `dist` en la raíz) |
 | **Install Command** | `NODE_ENV=development pnpm install --frozen-lockfile` |
 
 > Si en el panel de Vercel ves **Override** activado en Build/Install, desactivalo o pegá exactamente los valores de arriba. El error `Cannot find module '@dentaflow/shared'` aparece cuando Vercel ejecuta `pnpm run build` (incluye la API) sin compilar `packages/shared` antes.
@@ -174,6 +174,7 @@ VITE_API_URL=https://dentaflow-api-s3u3.onrender.com/api
 |----------|----------|
 | `Cannot find module '@dentaflow/shared'` | Build = **`pnpm -w run build:vercel`**, no `pnpm run build`. Root = repo completo, no solo `apps/web`. |
 | `Missing script: build:vercel` | Root Directory = `apps/web` en Vercel. Usá **`pnpm -w run build:vercel`** o dejá que `apps/web/vercel.json` lo configure. |
+| `No Output Directory named "dist" found` | Output Directory debe ser **`dist`**. Si tenés override en el panel con otro valor, cambialo o desactivá el override. |
 | Logs muestran `users.controller.ts` / API | Vercel está compilando el backend; solo debe correr `build:vercel` (shared + web). |
 | Override en Vercel | Desactivá overrides de Build/Install o copiá los valores de la tabla de arriba. |
 

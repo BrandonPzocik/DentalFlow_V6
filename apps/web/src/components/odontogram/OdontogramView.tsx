@@ -5,7 +5,6 @@ import {
   UPPER_RIGHT, UPPER_LEFT, LOWER_LEFT, LOWER_RIGHT,
 } from '@dentaflow/shared';
 import { cn } from '@/lib/utils';
-import { ToothAnatomyIcon } from './ToothAnatomyIcon';
 
 export interface ToothSelection {
   toothNumber: number;
@@ -38,11 +37,12 @@ const ALL_SURFACES = [
   ToothSurface.PALATAL,
 ];
 
-function SchematicSquare({
+function ToothCell({
   number,
   record,
   isSelected,
   selectedSurface,
+  isFlipped,
   onSelect,
   onSurfaceSelect,
 }: {
@@ -50,6 +50,7 @@ function SchematicSquare({
   record?: ToothRecord;
   isSelected: boolean;
   selectedSurface: ToothSurface | null;
+  isFlipped: boolean;
   onSelect: () => void;
   onSurfaceSelect: (surface: ToothSurface) => void;
 }) {
@@ -57,120 +58,108 @@ function SchematicSquare({
   const isAbsent = record?.generalStatus === ToothStatus.ABSENT;
 
   return (
-    <div
-      className={cn(
-        'relative cursor-pointer transition-transform hover:scale-105',
-        isSelected && 'scale-105',
+    <div className="flex flex-col items-center gap-1 w-9">
+      {!isFlipped && (
+        <span className="text-xs font-mono font-medium text-slate-600 leading-none">{number}</span>
       )}
-      onClick={onSelect}
-    >
-      <svg width="34" height="34" viewBox="0 0 34 34">
-        {isSelected && (
-          <rect
-            x={cx - r - 1} y={cy - r - 1}
-            width={(r + 1) * 2} height={(r + 1) * 2}
-            rx={4}
-            fill="none" stroke="#0d9488" strokeWidth="1.5"
-          />
+
+      <div
+        className={cn(
+          'relative cursor-pointer transition-transform hover:scale-105',
+          isSelected && 'scale-105',
         )}
-        <rect
-          x={cx - r} y={cy - r} width={r * 2} height={r * 2}
-          rx="3"
-          fill={isAbsent ? '#e2e8f0' : '#ffffff'}
-          stroke={isSelected ? '#0d9488' : '#94a3b8'}
-          strokeWidth={isSelected ? 1.5 : 1}
-        />
-        {isAbsent && (
-          <>
-            <line x1={cx-6} y1={cy-6} x2={cx+6} y2={cy+6} stroke="#64748b" strokeWidth="1.5" strokeLinecap="round" />
-            <line x1={cx+6} y1={cy-6} x2={cx-6} y2={cy+6} stroke="#64748b" strokeWidth="1.5" strokeLinecap="round" />
-          </>
-        )}
-        {!isAbsent && ALL_SURFACES.map((surface) => {
-          const surfaceRecord = record?.surfaces[surface];
-          const color = surfaceRecord
-            ? TOOTH_STATUS_COLORS[surfaceRecord.status]
-            : 'transparent';
-          const faceSelected = isSelected && selectedSurface === surface;
-          return (
-            <path
-              key={surface}
-              d={getSurfacePath(surface, cx, cy, r)}
-              fill={color}
-              fillOpacity={color === 'transparent' ? 0 : 0.9}
-              stroke={faceSelected ? '#0d9488' : '#cbd5e1'}
-              strokeWidth={faceSelected ? 1.2 : 0.5}
-              className="hover:opacity-80 cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                onSurfaceSelect(surface);
-              }}
+        onClick={onSelect}
+      >
+        <svg width="34" height="34" viewBox="0 0 34 34">
+          {isSelected && (
+            <rect
+              x={cx - r - 1} y={cy - r - 1}
+              width={(r + 1) * 2} height={(r + 1) * 2}
+              rx={3}
+              fill="none" stroke="#0f766e" strokeWidth="1.5"
             />
-          );
-        })}
-        {record?.generalStatus && record.generalStatus !== ToothStatus.HEALTHY && !isAbsent && (
-          <circle
-            cx={cx} cy={cy} r={4}
-            fill={TOOTH_STATUS_COLORS[record.generalStatus]}
-            stroke="white" strokeWidth="0.8"
+          )}
+          <rect
+            x={cx - r} y={cy - r} width={r * 2} height={r * 2}
+            rx="2"
+            fill={isAbsent ? '#e2e8f0' : '#fff'}
+            stroke={isSelected ? '#0f766e' : '#94a3b8'}
+            strokeWidth={isSelected ? 1.5 : 1}
           />
-        )}
-      </svg>
+          {isAbsent && (
+            <>
+              <line x1={cx-6} y1={cy-6} x2={cx+6} y2={cy+6} stroke="#64748b" strokeWidth="1.5" strokeLinecap="round" />
+              <line x1={cx+6} y1={cy-6} x2={cx-6} y2={cy+6} stroke="#64748b" strokeWidth="1.5" strokeLinecap="round" />
+            </>
+          )}
+          {!isAbsent && ALL_SURFACES.map((surface) => {
+            const surfaceRecord = record?.surfaces[surface];
+            const color = surfaceRecord
+              ? TOOTH_STATUS_COLORS[surfaceRecord.status]
+              : 'transparent';
+            const faceSelected = isSelected && selectedSurface === surface;
+            return (
+              <path
+                key={surface}
+                d={getSurfacePath(surface, cx, cy, r)}
+                fill={color}
+                fillOpacity={color === 'transparent' ? 0 : 0.88}
+                stroke={faceSelected ? '#0f766e' : '#cbd5e1'}
+                strokeWidth={faceSelected ? 1.2 : 0.5}
+                className="hover:opacity-80 cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSurfaceSelect(surface);
+                }}
+              />
+            );
+          })}
+          {record?.generalStatus && record.generalStatus !== ToothStatus.HEALTHY && !isAbsent && (
+            <circle
+              cx={cx} cy={cy} r={3.5}
+              fill={TOOTH_STATUS_COLORS[record.generalStatus]}
+              stroke="white" strokeWidth="0.8"
+            />
+          )}
+        </svg>
+      </div>
+
+      {isFlipped && (
+        <span className="text-xs font-mono font-medium text-slate-600 leading-none">{number}</span>
+      )}
     </div>
   );
 }
 
-function ToothColumn({
-  number,
-  record,
+function TeethRow({
+  teeth,
+  odontogram,
   selection,
-  arch,
+  isFlipped,
   onSelect,
   onSurfaceSelect,
 }: {
-  number: number;
-  record?: ToothRecord;
+  teeth: number[];
+  odontogram: Odontogram;
   selection: ToothSelection | null;
-  arch: 'upper' | 'lower';
-  onSelect: () => void;
-  onSurfaceSelect: (surface: ToothSurface) => void;
+  isFlipped: boolean;
+  onSelect: (n: number) => void;
+  onSurfaceSelect: (n: number, s: ToothSurface) => void;
 }) {
-  const isSelected = selection?.toothNumber === number;
-  const selectedSurface = isSelected ? selection.surface : null;
-
-  if (arch === 'upper') {
-    return (
-      <div className="flex flex-col items-center gap-0.5 w-[38px]">
-        <button type="button" onClick={onSelect} className="p-0 border-0 bg-transparent">
-          <ToothAnatomyIcon number={number} arch="upper" isSelected={isSelected} />
-        </button>
-        <span className="text-[10px] font-mono font-medium text-slate-600 leading-none">{number}</span>
-        <SchematicSquare
-          number={number}
-          record={record}
-          isSelected={isSelected}
-          selectedSurface={selectedSurface}
-          onSelect={onSelect}
-          onSurfaceSelect={onSurfaceSelect}
-        />
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col items-center gap-0.5 w-[38px]">
-      <SchematicSquare
-        number={number}
-        record={record}
-        isSelected={isSelected}
-        selectedSurface={selectedSurface}
-        onSelect={onSelect}
-        onSurfaceSelect={onSurfaceSelect}
-      />
-      <span className="text-[10px] font-mono font-medium text-slate-600 leading-none">{number}</span>
-      <button type="button" onClick={onSelect} className="p-0 border-0 bg-transparent">
-        <ToothAnatomyIcon number={number} arch="lower" isSelected={isSelected} />
-      </button>
+    <div className="flex gap-0.5">
+      {teeth.map((num) => (
+        <ToothCell
+          key={num}
+          number={num}
+          record={odontogram[num]}
+          isSelected={selection?.toothNumber === num}
+          selectedSurface={selection?.toothNumber === num ? selection.surface : null}
+          isFlipped={isFlipped}
+          onSelect={() => onSelect(num)}
+          onSurfaceSelect={(s) => onSurfaceSelect(num, s)}
+        />
+      ))}
     </div>
   );
 }
@@ -198,38 +187,6 @@ function Legend() {
   );
 }
 
-function ArchHalf({
-  teeth,
-  odontogram,
-  selection,
-  arch,
-  onSelect,
-  onSurfaceSelect,
-}: {
-  teeth: number[];
-  odontogram: Odontogram;
-  selection: ToothSelection | null;
-  arch: 'upper' | 'lower';
-  onSelect: (n: number) => void;
-  onSurfaceSelect: (n: number, s: ToothSurface) => void;
-}) {
-  return (
-    <div className="flex gap-0.5">
-      {teeth.map((num) => (
-        <ToothColumn
-          key={num}
-          number={num}
-          record={odontogram[num]}
-          selection={selection}
-          arch={arch}
-          onSelect={() => onSelect(num)}
-          onSurfaceSelect={(s) => onSurfaceSelect(num, s)}
-        />
-      ))}
-    </div>
-  );
-}
-
 export function OdontogramView({ odontogram, selection, onSelect }: OdontogramProps) {
   function handleToothSelect(n: number) {
     if (selection?.toothNumber === n && selection.surface === null) {
@@ -246,60 +203,59 @@ export function OdontogramView({ odontogram, selection, onSelect }: OdontogramPr
   return (
     <div className="odontogram-panel p-5 overflow-x-auto">
       <p className="text-sm text-slate-600 mb-4">
-        Arriba y abajo: forma del diente. En el centro: caras en <strong className="font-medium text-slate-800">cuadrados</strong> (clic en diente o cara).
+        Clic en un diente o en una cara del cuadrado. El formulario de prestación aparece debajo.
       </p>
-      <div className="min-w-[640px] bg-slate-50/80 border border-slate-200 rounded-xl p-4">
+
+      <div className="min-w-[600px] mx-auto">
         {/* Arcada superior */}
-        <div className="flex justify-center gap-2 mb-2">
-          <div className="flex gap-0.5 border-r-2 border-slate-300 pr-2">
-            <ArchHalf
+        <div className="flex justify-center gap-1 pb-1">
+          <div className="flex gap-0.5 border-r-2 border-slate-400 pr-2">
+            <TeethRow
               teeth={UPPER_RIGHT}
               odontogram={odontogram}
               selection={selection}
-              arch="upper"
+              isFlipped={false}
               onSelect={handleToothSelect}
               onSurfaceSelect={handleSurfaceSelect}
             />
           </div>
           <div className="flex gap-0.5 pl-2">
-            <ArchHalf
+            <TeethRow
               teeth={UPPER_LEFT}
               odontogram={odontogram}
               selection={selection}
-              arch="upper"
+              isFlipped={false}
               onSelect={handleToothSelect}
               onSurfaceSelect={handleSurfaceSelect}
             />
           </div>
         </div>
 
-        <div className="relative my-3 py-1">
-          <div className="absolute inset-x-4 top-1/2 border-t-2 border-dashed border-slate-300" />
-          <div className="relative flex justify-center">
-            <span className="bg-slate-50 px-3 py-0.5 text-xs font-medium text-slate-500 uppercase tracking-wider border border-slate-200 rounded-full">
-              Línea media
-            </span>
-          </div>
+        <div className="relative my-2 py-2">
+          <div className="absolute inset-x-8 top-1/2 border-t border-dashed border-slate-400" />
+          <p className="relative text-center text-xs text-slate-500 bg-white inline-block px-2 mx-auto w-fit block">
+            Línea media
+          </p>
         </div>
 
         {/* Arcada inferior */}
-        <div className="flex justify-center gap-2 mt-2">
-          <div className="flex gap-0.5 border-r-2 border-slate-300 pr-2">
-            <ArchHalf
+        <div className="flex justify-center gap-1 pt-1">
+          <div className="flex gap-0.5 border-r-2 border-slate-400 pr-2">
+            <TeethRow
               teeth={LOWER_LEFT}
               odontogram={odontogram}
               selection={selection}
-              arch="lower"
+              isFlipped
               onSelect={handleToothSelect}
               onSurfaceSelect={handleSurfaceSelect}
             />
           </div>
           <div className="flex gap-0.5 pl-2">
-            <ArchHalf
+            <TeethRow
               teeth={LOWER_RIGHT}
               odontogram={odontogram}
               selection={selection}
-              arch="lower"
+              isFlipped
               onSelect={handleToothSelect}
               onSurfaceSelect={handleSurfaceSelect}
             />

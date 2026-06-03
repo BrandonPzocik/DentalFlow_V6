@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { X, ClipboardList, Box, Layers } from 'lucide-react';
+import { X, ClipboardList } from 'lucide-react';
 import {
   ToothStatus,
   ToothSurface,
@@ -11,9 +11,7 @@ import {
 import { odontogramApi } from '@/api';
 import { formatDateTime } from '@/lib/utils';
 import { InteractiveTooth3D } from './InteractiveTooth3D';
-import { SketchfabDundeeViewer } from './SketchfabDundeeViewer';
 import { SURFACE_LABELS, SURFACE_SHORT } from './odontogram.constants';
-import { cn } from '@/lib/utils';
 
 interface Props {
   toothNumber: number;
@@ -24,8 +22,6 @@ interface Props {
   onClose?: () => void;
 }
 
-type ViewerTab = 'dundee' | 'faces';
-
 export function Tooth3DPanel({
   toothNumber,
   patientId,
@@ -34,7 +30,6 @@ export function Tooth3DPanel({
   onSurfaceChange,
   onClose,
 }: Props) {
-  const [viewerTab, setViewerTab] = useState<ViewerTab>('dundee');
   const [hoveredSurface, setHoveredSurface] = useState<ToothSurface | null>(null);
   const record = odontogram[toothNumber];
 
@@ -46,11 +41,11 @@ export function Tooth3DPanel({
 
   return (
     <div className="flex flex-col">
-      <div className="flex items-start justify-between mb-3 gap-2">
-        <div className="min-w-0">
-          <span className="nav-section-label text-slate-500">Referencia 3D</span>
-          <div className="flex items-baseline gap-2 mt-1 flex-wrap">
-            <span className="section-heading">Diente {toothNumber}</span>
+      <div className="flex items-start justify-between mb-3">
+        <div>
+          <span className="nav-section-label text-slate-500">Diente seleccionado</span>
+          <div className="flex items-baseline gap-2 mt-1">
+            <span className="section-heading">FDI {toothNumber}</span>
             {selectedSurface && (
               <span className="text-sm font-medium text-teal-800">
                 · Cara {SURFACE_SHORT[selectedSurface]}
@@ -58,7 +53,7 @@ export function Tooth3DPanel({
             )}
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2">
           {record?.generalStatus && record.generalStatus !== ToothStatus.HEALTHY && (
             <span
               className="badge text-micro"
@@ -71,60 +66,27 @@ export function Tooth3DPanel({
             </span>
           )}
           {onClose && (
-            <button
-              type="button"
-              className="btn-ghost btn-sm p-1"
-              onClick={onClose}
-              aria-label="Cerrar"
-            >
+            <button type="button" className="btn-ghost btn-sm p-1" onClick={onClose} aria-label="Cerrar">
               <X size={16} />
             </button>
           )}
         </div>
       </div>
 
-      <div className="inline-flex border border-slate-300 rounded-lg overflow-hidden mb-3">
-        <button
-          type="button"
-          onClick={() => setViewerTab('dundee')}
-          className={cn(
-            'flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors',
-            viewerTab === 'dundee' ? 'bg-teal-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-50',
-          )}
-        >
-          <Box size={14} /> Morphología Dundee
-        </button>
-        <button
-          type="button"
-          onClick={() => setViewerTab('faces')}
-          className={cn(
-            'flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors border-l border-slate-300',
-            viewerTab === 'faces' ? 'bg-teal-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-50',
-          )}
-        >
-          <Layers size={14} /> Caras (clínico)
-        </button>
-      </div>
+      <InteractiveTooth3D
+        toothNumber={toothNumber}
+        record={record}
+        hoveredSurface={hoveredSurface}
+        selectedSurface={selectedSurface}
+        onSurfaceClick={onSurfaceChange}
+        onSurfaceHover={setHoveredSurface}
+      />
 
-      {viewerTab === 'dundee' ? (
-        <SketchfabDundeeViewer toothNumber={toothNumber} />
-      ) : (
-        <>
-          <InteractiveTooth3D
-            toothNumber={toothNumber}
-            record={record}
-            hoveredSurface={hoveredSurface}
-            selectedSurface={selectedSurface}
-            onSurfaceClick={onSurfaceChange}
-            onSurfaceHover={setHoveredSurface}
-          />
-          <p className="text-sm text-slate-500 text-center mt-2 mb-1">
-            Clic en una cara para registrar en el odontograma.
-          </p>
-        </>
-      )}
+      <p className="text-sm text-slate-500 text-center mt-2 mb-3">
+        Clic en una cara · el formulario está debajo del odontograma
+      </p>
 
-      <div className="border-t border-slate-300 pt-3 mt-4">
+      <div className="border-t border-slate-300 pt-3">
         <div className="flex items-center gap-2 mb-2">
           <ClipboardList size={14} className="text-teal-800" />
           <span className="font-medium text-sm text-slate-800">Historial del diente</span>
@@ -136,7 +98,7 @@ export function Tooth3DPanel({
             </div>
           ) : !interventions || interventions.length === 0 ? (
             <div className="empty-state py-6">
-              <p className="empty-state-text">Sin intervenciones registradas en este diente.</p>
+              <p className="empty-state-text">Sin intervenciones registradas.</p>
             </div>
           ) : (
             interventions.map(
@@ -172,12 +134,8 @@ export function Tooth3DPanel({
                         <p className="text-xs text-slate-500 mt-0.5 italic">{rec.notes}</p>
                       )}
                       <div className="flex items-center justify-between mt-1 gap-2">
-                        <p className="text-xs text-slate-400">
-                          Dr. {rec.performedBy?.lastName ?? '—'}
-                        </p>
-                        <p className="text-xs text-slate-400 shrink-0">
-                          {formatDateTime(rec.createdAt)}
-                        </p>
+                        <p className="text-xs text-slate-400">Dr. {rec.performedBy?.lastName ?? '—'}</p>
+                        <p className="text-xs text-slate-400 shrink-0">{formatDateTime(rec.createdAt)}</p>
                       </div>
                     </div>
                   </div>

@@ -4,6 +4,7 @@ import { X, Plus, Trash2, Save, Search } from 'lucide-react';
 import { billingApi, patientsApi, socialWorksApi } from '@/api';
 import { useAuthStore } from '@/store/auth.store';
 import { cn } from '@/lib/utils';
+import { Modal } from '@/components/ui/Modal';
 
 interface Props { onClose: () => void; onSuccess: () => void; }
 
@@ -85,8 +86,7 @@ export function NewInvoiceModal({ onClose, onSuccess }: Props) {
   const nomItems = selectedSW?.nomenclator?.filter((n: any) => n.isActive) ?? [];
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="modal-shell w-full max-w-3xl my-6">
+    <Modal open onClose={onClose} maxWidth="max-w-3xl" scrollable>
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white z-10">
           <h2 className="section-heading">Nueva factura</h2>
           <button className="p-1.5 hover:bg-slate-100 border border-transparent" onClick={onClose}><X size={18} /></button>
@@ -274,7 +274,6 @@ export function NewInvoiceModal({ onClose, onSuccess }: Props) {
             {mutation.isPending ? 'Guardando…' : 'Emitir factura'}
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

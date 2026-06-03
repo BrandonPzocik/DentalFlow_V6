@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { X, FileText, Printer } from 'lucide-react';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { billingApi, socialWorksApi, settingsApi } from '@/api';
+import { Modal } from '@/components/ui/Modal';
 
 interface Props { onClose: () => void; }
 
@@ -325,10 +326,7 @@ export function LiquidationModal({ onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="modal-shell w-full max-w-3xl">
-
-        {/* Modal header */}
+    <Modal open onClose={onClose} maxWidth="max-w-3xl" scrollable>
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
           <div className="flex items-center gap-2">
             <FileText size={20} className="text-teal-600" />
@@ -461,7 +459,6 @@ export function LiquidationModal({ onClose }: Props) {
         <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end">
           <button className="btn-secondary" onClick={onClose}>Cerrar</button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

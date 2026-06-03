@@ -3,6 +3,7 @@ import { X, CheckCircle, Send, XCircle, DollarSign, Mail } from 'lucide-react';
 import { billingApi, notificationsApi, settingsApi } from '@/api';
 import { buildInvoiceHtml } from '@/lib/clinicalDocuments';
 import { cn } from '@/lib/utils';
+import { Modal } from '@/components/ui/Modal';
 
 interface Props { invoice: any; onClose: () => void; onUpdate: () => void; }
 
@@ -63,8 +64,7 @@ export function InvoiceDetailModal({ invoice, onClose, onUpdate }: Props) {
   const canEmail = !!invoice.patient?.email && invoice.patient?.acceptsEmail !== false;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="modal-shell w-full max-w-lg">
+    <Modal open onClose={onClose} maxWidth="max-w-lg" scrollable>
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
           <div>
             <h2 className="section-heading">{invoice.number}</h2>
@@ -177,7 +177,6 @@ export function InvoiceDetailModal({ invoice, onClose, onUpdate }: Props) {
           )}
           <button className="btn-secondary btn-sm ml-auto" onClick={onClose}>Cerrar</button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

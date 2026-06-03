@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { X, Save } from 'lucide-react';
 import { patientsApi, socialWorksApi } from '@/api';
+import { Modal } from '@/components/ui/Modal';
 
 interface Props {
   patient: any;
@@ -44,8 +45,7 @@ export function EditPatientModal({ patient, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="modal-shell w-full max-w-2xl my-6">
+    <Modal open onClose={onClose} maxWidth="max-w-2xl" scrollable>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white z-10">
           <h2 className="section-heading">Editar paciente</h2>
@@ -193,7 +193,6 @@ export function EditPatientModal({ patient, onClose }: Props) {
             {mutation.isPending ? 'Guardando…' : 'Guardar cambios'}
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

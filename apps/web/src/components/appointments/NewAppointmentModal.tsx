@@ -11,6 +11,7 @@ import {
   isDateTimeInPast,
   minDateTimeForBooking,
 } from '@/lib/agendaSchedule';
+import { Modal } from '@/components/ui/Modal';
 
 interface Props {
   initialDate: Date | null;
@@ -80,8 +81,7 @@ export function NewAppointmentModal({ initialDate, schedule, onClose, onSuccess 
     setForm((f) => ({ ...f, [field]: value }));
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="modal-shell w-full max-w-md">
+    <Modal open onClose={onClose} maxWidth="max-w-md">
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
           <h2 className="section-heading">Nuevo turno</h2>
           <button type="button" className="p-1.5 hover:bg-slate-100 border border-transparent" onClick={onClose}>
@@ -210,7 +210,6 @@ export function NewAppointmentModal({ initialDate, schedule, onClose, onSuccess 
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }

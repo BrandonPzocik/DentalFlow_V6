@@ -1,4 +1,5 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Upload, Trash2, ZoomIn, ZoomOut, RotateCw,
@@ -60,6 +61,17 @@ function ImageViewer({
     setContrast(100); setInvert(false); setPan({ x: 0, y: 0 });
   }
 
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [onClose]);
+
   const imgStyle = {
     transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom}) rotate(${rotation}deg)`,
     filter: `brightness(${brightness}%) contrast(${contrast}%)${invert ? ' invert(1)' : ''}`,
@@ -68,8 +80,8 @@ function ImageViewer({
     transition: dragging ? 'none' : 'transform 0.1s',
   };
 
-  return (
-    <div className="fixed inset-0 bg-black z-50 flex flex-col">
+  return createPortal(
+    <div className="fixed inset-0 bg-black z-[200] flex flex-col">
       {/* Toolbar */}
       <div className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 border-b border-slate-700 flex-shrink-0">
         <span className="text-white text-sm font-medium truncate flex-1">{originalName}</span>
@@ -148,7 +160,8 @@ function ImageViewer({
       <div className="px-4 py-2 bg-slate-900 text-center">
         <span className="text-xs text-slate-500">Scroll para hacer zoom · Arrastrar para mover · NEG invierte colores para Rx</span>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

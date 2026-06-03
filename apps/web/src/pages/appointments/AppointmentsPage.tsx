@@ -27,6 +27,7 @@ import {
   getAvailableSlotClass,
 } from '@/lib/appointmentDisplay';
 import { AppointmentStatusBadge, WaOriginBadge, hasWaOrigin } from '@/components/ui/AppointmentStatusBadge';
+import { Modal } from '@/components/ui/Modal';
 
 type ViewMode = 'day' | 'week';
 
@@ -53,9 +54,9 @@ function AppointmentPanel({ apt, onClose, onStatus, onCancel, onReminder, onReas
   const date = new Date(apt.scheduledAt).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+    <Modal open onClose={onClose} maxWidth="max-w-sm">
       <div
-        className="modal-shell w-full max-w-sm overflow-hidden"
+        className="overflow-hidden"
         style={{ borderLeftWidth: 4, borderLeftColor: visual.borderLeftColor, borderLeftStyle: cancelled ? 'dashed' : 'solid' }}
       >
         <div className="px-4 py-4">
@@ -158,7 +159,7 @@ function AppointmentPanel({ apt, onClose, onStatus, onCancel, onReminder, onReas
           )}
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
 

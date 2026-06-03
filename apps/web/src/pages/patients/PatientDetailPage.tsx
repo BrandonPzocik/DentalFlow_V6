@@ -19,6 +19,7 @@ import { generateOdontogramPdf } from '@/lib/odontogramPdf';
 import { calcAge, cn } from '@/lib/utils';
 import { AppointmentStatus } from '@dentaflow/shared';
 import { AppointmentStatusBadge } from '@/components/ui/AppointmentStatusBadge';
+import { Modal } from '@/components/ui/Modal';
 
 const TABS = ['Odontograma', 'Estudios', 'Recetario', 'Turnos', 'Historia clínica'] as const;
 type Tab = typeof TABS[number];
@@ -351,8 +352,8 @@ export function PatientDetailPage() {
 
       {/* Delete confirm */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-slide-up">
+        <Modal open onClose={() => setShowDeleteConfirm(false)} maxWidth="max-w-sm">
+          <div className="p-6">
             <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
               <Trash2 size={22} className="text-red-500" />
             </div>
@@ -374,7 +375,7 @@ export function PatientDetailPage() {
               </button>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   );

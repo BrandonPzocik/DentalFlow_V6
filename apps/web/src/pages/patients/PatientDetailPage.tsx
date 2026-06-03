@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { patientsApi, odontogramApi, appointmentsApi, settingsApi } from '@/api';
 import { OdontogramView, type ToothSelection } from '@/components/odontogram/OdontogramView';
+import { SketchfabDundeeViewer } from '@/components/odontogram/SketchfabDundeeViewer';
 import { ToothTreatmentPanel } from '@/components/odontogram/ToothTreatmentPanel';
 
 const Tooth3DPanel = lazy(() =>
@@ -257,12 +258,14 @@ export function PatientDetailPage() {
                   </Suspense>
                 </div>
               ) : (
-                <div className="panel p-6 text-center h-full min-h-[16rem] flex flex-col items-center justify-center">
-                  <div className="text-4xl mb-2">🦷</div>
-                  <p className="text-sm text-slate-600 font-medium">Panel de prestaciones</p>
-                  <p className="text-xs text-slate-400 mt-1 max-w-xs">
-                    Seleccioná un diente para ver el modelo 3D y el historial. El formulario de prestación aparece debajo del odontograma.
-                  </p>
+                <div className="panel p-4 space-y-4 lg:sticky lg:top-4">
+                  <div>
+                    <p className="section-heading">Biblioteca 3D — Dundee</p>
+                    <p className="text-sm text-slate-600 mt-1">
+                      Seleccioná un diente en el odontograma para ver su modelo, o explorá la colección completa.
+                    </p>
+                  </div>
+                  <SketchfabDundeeViewer compact />
                 </div>
               )}
             </div>

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "pnpm --filter @dentaflow/shared build && pnpm --parallel --filter './apps/*' dev",
     "build": "pnpm --filter @dentaflow/shared build && pnpm --filter api build && pnpm --filter web build",
-    "build:vercel": "pnpm --filter @dentaflow/shared build && pnpm --filter web build && rm -rf dist && cp -r apps/web/dist dist",
+    "build:vercel": "pnpm --filter @dentaflow/shared build && pnpm --filter web build",
     "build:render": "pnpm --filter @dentaflow/shared build && pnpm --filter api build",
     "start:render": "node apps/api/dist/main.js",
     "lint": "pnpm --recursive lint",

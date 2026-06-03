@@ -16,6 +16,7 @@ export enum NotificationType {
   PRESCRIPTION         = 'prescription',
   BUDGET               = 'budget',
   INVOICE              = 'invoice',
+  PAYMENT_RECEIPT      = 'payment_receipt',
   BIRTHDAY             = 'birthday',
   INACTIVE_PATIENT     = 'inactive_patient',
   CUSTOM               = 'custom',

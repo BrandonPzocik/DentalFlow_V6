@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { format, addDays, startOfWeek, isSameDay, startOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { appointmentsApi, settingsApi } from '@/api';
+import { appointmentsApi, settingsApi, treatmentPlansApi } from '@/api';
 import { AppointmentStatus } from '@dentaflow/shared';
 import { cn } from '@/lib/utils';
 import { NewAppointmentModal } from '@/components/appointments/NewAppointmentModal';
@@ -167,10 +167,12 @@ function AppointmentBlock({
   apt,
   onSelect,
   onReassign,
+  hasPendingCuota,
 }: {
   apt: any;
   onSelect: () => void;
   onReassign: () => void;
+  hasPendingCuota?: boolean;
 }) {
   const visual = getAppointmentVisual(apt);
   const time = new Date(apt.scheduledAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
@@ -196,6 +198,9 @@ function AppointmentBlock({
         </p>
         <p className={cn('meta-label truncate', cancelled && 'text-slate-400')}>
           {apt.treatmentType ?? 'Consulta'}
+          {hasPendingCuota && !cancelled && (
+            <span className="ml-1 text-amber-700 font-medium">· Cuota pendiente</span>
+          )}
         </p>
       </button>
       {cancelled && (
@@ -247,6 +252,19 @@ export function AppointmentsPage() {
     queryFn: () => appointmentsApi.range(rangeFrom, rangeTo).then((r) => r.data),
     refetchInterval: 10000,
   });
+
+  const { data: overdueInstallments = [] } = useQuery({
+    queryKey: ['treatment-plans-overdue'],
+    queryFn: () => treatmentPlansApi.overdue().then((r) => r.data),
+  });
+
+  const patientsWithCuota = useMemo(() => {
+    const set = new Set<string>();
+    for (const inst of overdueInstallments as any[]) {
+      if (inst.plan?.patientId) set.add(inst.plan.patientId);
+    }
+    return set;
+  }, [overdueInstallments]);
 
   const statusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: AppointmentStatus }) =>
@@ -467,6 +485,7 @@ export function AppointmentsPage() {
                           apt={apt}
                           onSelect={() => setSelectedApt(apt)}
                           onReassign={() => openReassign(slotAt)}
+                          hasPendingCuota={apt.patientId ? patientsWithCuota.has(apt.patientId) : false}
                         />
                       ))}
                     </div>

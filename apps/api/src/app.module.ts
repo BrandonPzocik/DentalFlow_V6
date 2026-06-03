@@ -15,6 +15,7 @@ import { SettingsModule } from './modules/settings/settings.module';
 import { StudiesModule } from './modules/studies/studies.module';
 import { PrescriptionsModule } from './modules/prescriptions/prescriptions.module';
 import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
+import { TreatmentPlansModule } from './modules/treatment-plans/treatment-plans.module';
 import { buildTypeOrmOptions } from './database/typeorm.config';
 
 @Module({
@@ -38,6 +39,7 @@ import { buildTypeOrmOptions } from './database/typeorm.config';
     StudiesModule,
     PrescriptionsModule,
     WhatsappModule,
+    TreatmentPlansModule,
   ],
   controllers: [AppController],
 })

@@ -181,3 +181,26 @@ export const prescriptionsApi = {
   accept: (patientId: string, id: string) => api.patch(`/patients/${patientId}/prescriptions/${id}/accept`),
   remove: (patientId: string, id: string) => api.delete(`/patients/${patientId}/prescriptions/${id}`),
 };
+
+// ── Treatment Plans ───────────────────────────────────────────────────────────
+export const treatmentPlansApi = {
+  catalog: () => api.get('/treatment-plans/catalog'),
+  seedCatalog: () => api.post('/treatment-plans/catalog/seed'),
+  overdue: () => api.get('/treatment-plans/overdue'),
+  upcoming: (days = 7) => api.get('/treatment-plans/upcoming', { params: { days } }),
+  byPatient: (patientId: string) => api.get(`/patients/${patientId}/treatment-plans`),
+  pendingInstallments: (patientId: string) =>
+    api.get(`/patients/${patientId}/treatment-plans/pending-installments`),
+  get: (patientId: string, id: string) => api.get(`/patients/${patientId}/treatment-plans/${id}`),
+  create: (patientId: string, data: any) => api.post(`/patients/${patientId}/treatment-plans`, data),
+  fromBudget: (patientId: string, prescriptionId: string, data: any) =>
+    api.post(`/patients/${patientId}/treatment-plans/from-budget/${prescriptionId}`, data),
+  fromOdontogram: (patientId: string, data: any) =>
+    api.post(`/patients/${patientId}/treatment-plans/from-odontogram`, data),
+  updateStatus: (patientId: string, id: string, status: string) =>
+    api.patch(`/patients/${patientId}/treatment-plans/${id}/status`, { status }),
+  payInstallment: (patientId: string, planId: string, installmentId: string, data: any) =>
+    api.post(`/patients/${patientId}/treatment-plans/${planId}/installments/${installmentId}/pay`, data),
+  sendReceipt: (patientId: string, planId: string, installmentId: string) =>
+    api.post(`/patients/${patientId}/treatment-plans/${planId}/installments/${installmentId}/receipt`),
+};

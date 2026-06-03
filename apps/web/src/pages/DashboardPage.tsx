@@ -2,11 +2,11 @@ import { useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Users, Calendar, DollarSign, AlertCircle, Plus,
-  CheckCircle2, XCircle, CalendarClock, Phone, ArrowRight, CalendarX,
+  CheckCircle2, XCircle, CalendarClock, Phone, ArrowRight, CalendarX, CreditCard,
 } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, addMinutes, differenceInMinutes } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { appointmentsApi, patientsApi, billingApi, whatsappApi, settingsApi } from '@/api';
+import { appointmentsApi, patientsApi, billingApi, whatsappApi, settingsApi, treatmentPlansApi } from '@/api';
 import { useAuthStore } from '@/store/auth.store';
 import { AppointmentStatus } from '@dentaflow/shared';
 import { cn } from '@/lib/utils';
@@ -126,6 +126,11 @@ export function DashboardPage() {
     queryFn: () => whatsappApi.internal({ limit: 20 }).then((r) => r.data),
     refetchInterval: 10000,
   });
+  const { data: overdueInstallments = [] } = useQuery({
+    queryKey: ['treatment-plans-overdue'],
+    queryFn: () => treatmentPlansApi.overdue().then((r) => r.data),
+    refetchInterval: 60000,
+  });
 
   const markReadMutation = useMutation({
     mutationFn: (id: string) => whatsappApi.markRead(id),
@@ -238,6 +243,42 @@ export function DashboardPage() {
                     </li>
                   );
                 })}
+              </ul>
+            </section>
+          )}
+
+          {(overdueInstallments as any[]).length > 0 && (
+            <section className="panel overflow-hidden border-amber-200">
+              <div className="panel-header flex items-center justify-between bg-amber-50/80">
+                <h2 className="section-heading flex items-center gap-2 text-amber-900">
+                  <CreditCard size={16} className="text-amber-600" />
+                  Cuotas vencidas
+                </h2>
+                <span className="badge-pill bg-amber-700 text-white border-amber-700 text-micro px-2 py-0.5">
+                  {(overdueInstallments as any[]).length}
+                </span>
+              </div>
+              <ul className="divide-y divide-slate-200">
+                {(overdueInstallments as any[]).slice(0, 6).map((inst: any) => (
+                  <li key={inst.id} className="px-4 py-3 flex items-center justify-between gap-3 hover:bg-amber-50/30">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-slate-900">
+                        {inst.plan?.patient?.lastName}, {inst.plan?.patient?.firstName}
+                      </p>
+                      <p className="meta-label">
+                        {inst.plan?.title} · {inst.label} · {formatCurrency(Number(inst.amount))}
+                      </p>
+                      <p className="text-xs text-red-600 mt-0.5">
+                        Venció {new Date(inst.dueDate + 'T12:00:00').toLocaleDateString('es-AR')}
+                      </p>
+                    </div>
+                    {inst.plan?.patientId && (
+                      <Link to={`/patients/${inst.plan.patientId}`} className="btn-secondary btn-sm shrink-0">
+                        Ver plan
+                      </Link>
+                    )}
+                  </li>
+                ))}
               </ul>
             </section>
           )}

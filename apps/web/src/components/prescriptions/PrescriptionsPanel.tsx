@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Plus, Trash2, FileText, Printer, CheckCircle,
-  Pill, DollarSign, X, Save, Mail,
+  Pill, DollarSign, X, Save, Mail, ClipboardList,
 } from 'lucide-react';
 import { prescriptionsApi, settingsApi, notificationsApi } from '@/api';
+import { ConvertBudgetToPlanModal } from '@/components/treatment-plans/TreatmentPlansPanel';
 import { useAuthStore } from '@/store/auth.store';
 import { cn } from '@/lib/utils';
 import {
@@ -41,6 +42,7 @@ export function PrescriptionsPanel({ patientId, patient }: { patientId: string; 
   const [discountPercent, setDiscountPercent] = useState(0);
   const [validUntil, setValidUntil] = useState('');
   const [budgetNotes, setBudgetNotes] = useState('');
+  const [convertBudget, setConvertBudget] = useState<any>(null);
 
   const { data: clinicSettings = {} } = useQuery({
     queryKey: ['settings-flat'],
@@ -233,6 +235,15 @@ export function PrescriptionsPanel({ patientId, patient }: { patientId: string; 
                 {p.diagnosis && <p className="text-xs text-slate-400 italic">{p.diagnosis}</p>}
               </div>
               <div className="flex gap-1 flex-shrink-0">
+                {p.type === 'budget' && p.accepted && (
+                  <button
+                    className="btn-ghost btn-sm text-teal-700 hover:bg-teal-50"
+                    title="Convertir a plan de tratamiento con cuotas"
+                    onClick={() => setConvertBudget(p)}
+                  >
+                    <ClipboardList size={14} />
+                  </button>
+                )}
                 {p.type === 'budget' && !p.accepted && (
                   <button
                     className="btn-ghost btn-sm text-emerald-600 hover:bg-emerald-50"
@@ -444,6 +455,14 @@ export function PrescriptionsPanel({ patientId, patient }: { patientId: string; 
             </button>
           </div>
         </div>
+      )}
+
+      {convertBudget && (
+        <ConvertBudgetToPlanModal
+          patientId={patientId}
+          budget={convertBudget}
+          onClose={() => setConvertBudget(null)}
+        />
       )}
     </div>
   );

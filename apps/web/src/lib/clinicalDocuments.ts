@@ -191,3 +191,52 @@ export function wrapForPrint(html: string): string {
 <button class="no-print" onclick="window.print()" style="position:fixed;top:12px;right:12px;background:#0d9488;color:#fff;border:none;border-radius:8px;padding:9px 20px;cursor:pointer">🖨️ Imprimir</button>`,
   );
 }
+
+const PAYMENT_METHOD_LABELS: Record<string, string> = {
+  cash: 'Efectivo',
+  card_debit: 'Débito',
+  card_credit: 'Crédito',
+  transfer: 'Transferencia',
+  mercado_pago: 'Mercado Pago',
+  social_work: 'Obra social',
+};
+
+export function buildPaymentReceiptHtml(data: {
+  clinicName: string;
+  clinicAddress?: string;
+  patient: any;
+  plan: any;
+  installment: any;
+  paidCount: number;
+  totalInstallments: number;
+}): string {
+  const inst = data.installment;
+  const paidExtra = Number(data.plan.downPayment) > 0 ? 1 : 0;
+
+  return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<title>Recibo ${inst.receiptNumber ?? ''}</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;color:#334155}</style></head><body>
+<div style="max-width:560px;margin:0 auto;padding:16px">
+  <div style="border-bottom:3px solid #0d9488;padding-bottom:12px;margin-bottom:16px">
+    <div style="font-size:17px;font-weight:800">${data.clinicName}</div>
+    ${data.clinicAddress ? `<div style="font-size:11px;color:#64748b">${data.clinicAddress}</div>` : ''}
+    <div style="margin-top:8px;font-size:14px;font-weight:700;color:#0f766e">RECIBO DE PAGO — ${inst.receiptNumber ?? '—'}</div>
+  </div>
+  <div style="background:#f0fdfa;border:1px solid #99f6e4;border-radius:10px;padding:14px;margin-bottom:16px">
+    <div style="font-weight:700">${data.patient.lastName}, ${data.patient.firstName}</div>
+    <div style="font-size:12px;color:#64748b">DNI ${data.patient.dni}</div>
+  </div>
+  <table style="width:100%;border-collapse:collapse;margin-bottom:16px">
+    <tr><td style="padding:8px 0;color:#64748b">Tratamiento</td><td style="padding:8px 0;text-align:right;font-weight:600">${data.plan.title}</td></tr>
+    <tr><td style="padding:8px 0;color:#64748b">Concepto</td><td style="padding:8px 0;text-align:right;font-weight:600">${inst.label}</td></tr>
+    <tr><td style="padding:8px 0;color:#64748b">Método de pago</td><td style="padding:8px 0;text-align:right">${PAYMENT_METHOD_LABELS[inst.paymentMethod] ?? inst.paymentMethod ?? '—'}</td></tr>
+    <tr><td style="padding:8px 0;color:#64748b">Fecha de pago</td><td style="padding:8px 0;text-align:right">${inst.paidAt ? new Date(inst.paidAt + 'T12:00:00').toLocaleDateString('es-AR') : '—'}</td></tr>
+    <tr style="border-top:2px solid #e2e8f0"><td style="padding:12px 0;font-size:15px;font-weight:700">Monto abonado</td><td style="padding:12px 0;text-align:right;font-size:18px;font-weight:800;color:#0f766e">${fmtArs(Number(inst.amount))}</td></tr>
+    <tr><td style="padding:8px 0;color:#64748b">Cuotas pagadas</td><td style="padding:8px 0;text-align:right">${data.paidCount} de ${data.totalInstallments + paidExtra}</td></tr>
+    <tr><td style="padding:8px 0;color:#64748b">Saldo pendiente</td><td style="padding:8px 0;text-align:right;font-weight:600;color:#d97706">${fmtArs(Number(data.plan.pendingAmount))}</td></tr>
+  </table>
+  <div style="font-size:11px;color:#94a3b8;padding-top:12px;border-top:1px solid #e2e8f0">
+    Comprobante emitido el ${new Date().toLocaleDateString('es-AR')} · ${data.clinicName}
+  </div>
+</div></body></html>`;
+}

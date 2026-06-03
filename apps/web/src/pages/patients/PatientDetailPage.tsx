@@ -15,13 +15,14 @@ const Tooth3DPanel = lazy(() =>
 import { EditPatientModal } from '@/components/patients/EditPatientModal';
 import { StudiesPanel } from '@/components/studies/StudiesPanel';
 import { PrescriptionsPanel } from '@/components/prescriptions/PrescriptionsPanel';
+import { TreatmentPlansPanel } from '@/components/treatment-plans/TreatmentPlansPanel';
 import { generateOdontogramPdf } from '@/lib/odontogramPdf';
 import { calcAge, cn } from '@/lib/utils';
 import { AppointmentStatus } from '@dentaflow/shared';
 import { AppointmentStatusBadge } from '@/components/ui/AppointmentStatusBadge';
 import { Modal } from '@/components/ui/Modal';
 
-const TABS = ['Odontograma', 'Estudios', 'Recetario', 'Turnos', 'Historia clínica'] as const;
+const TABS = ['Odontograma', 'Tratamientos', 'Estudios', 'Recetario', 'Turnos', 'Historia clínica'] as const;
 type Tab = typeof TABS[number];
 
 export function PatientDetailPage() {
@@ -267,6 +268,11 @@ export function PatientDetailPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── TREATMENT PLANS TAB ── */}
+      {tab === 'Tratamientos' && (
+        <TreatmentPlansPanel patientId={id!} patient={patient} />
       )}
 
       {/* ── STUDIES TAB ── */}

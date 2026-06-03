@@ -8,7 +8,7 @@ import {
   TOOTH_STATUS_LABELS,
   Odontogram,
 } from '@dentaflow/shared';
-import { odontogramApi } from '@/api';
+import { odontogramApi, treatmentPlansApi } from '@/api';
 import { cn } from '@/lib/utils';
 import { ALL_SURFACES_ORDER, SURFACE_LABELS, SURFACE_SHORT } from './odontogram.constants';
 
@@ -35,6 +35,9 @@ export function ToothTreatmentForm({
   const [material, setMaterial] = useState('');
   const [notes, setNotes] = useState('');
   const [justSaved, setJustSaved] = useState(false);
+  const [createPlan, setCreatePlan] = useState(false);
+  const [planPrice, setPlanPrice] = useState(0);
+  const [planInstallments, setPlanInstallments] = useState(1);
 
   const currentStatus = selectedSurface
     ? record?.surfaces[selectedSurface]?.status
@@ -52,16 +55,30 @@ export function ToothTreatmentForm({
   }, [toothNumber, selectedSurface]);
 
   const mutation = useMutation({
-    mutationFn: (data: {
+    mutationFn: async (data: {
       toothNumber: number;
       surface?: ToothSurface;
       status: ToothStatus;
       material?: string;
       notes?: string;
-    }) => odontogramApi.registerTreatment(patientId, data),
+    }) => {
+      await odontogramApi.registerTreatment(patientId, data);
+      if (createPlan && planPrice > 0) {
+        await treatmentPlansApi.fromOdontogram(patientId, {
+          title: `${TOOTH_STATUS_LABELS[data.status]} — pieza ${data.toothNumber}`,
+          category: 'Odontograma',
+          totalPrice: planPrice,
+          installmentCount: planInstallments,
+          startDate: new Date().toISOString().split('T')[0],
+          toothNumber: data.toothNumber,
+          notes: data.notes,
+        });
+      }
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['odontogram', patientId] });
       qc.invalidateQueries({ queryKey: ['tooth-history', patientId, toothNumber] });
+      qc.invalidateQueries({ queryKey: ['treatment-plans', patientId] });
       setMaterial('');
       setNotes('');
       setJustSaved(true);
@@ -176,6 +193,25 @@ export function ToothTreatmentForm({
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Clase II, profundidad, observaciones…"
         />
+      </div>
+
+      <div className="border border-slate-200 rounded-lg p-3 space-y-2 bg-slate-50/50">
+        <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+          <input type="checkbox" checked={createPlan} onChange={(e) => setCreatePlan(e.target.checked)} />
+          Crear plan de cobro con cuotas
+        </label>
+        {createPlan && (
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="label text-xs">Precio total</label>
+              <input className="input text-sm" type="number" min={0} value={planPrice} onChange={(e) => setPlanPrice(Number(e.target.value))} />
+            </div>
+            <div>
+              <label className="label text-xs">Cuotas</label>
+              <input className="input text-sm" type="number" min={1} value={planInstallments} onChange={(e) => setPlanInstallments(Number(e.target.value))} />
+            </div>
+          </div>
+        )}
       </div>
 
       {mutation.isError && (

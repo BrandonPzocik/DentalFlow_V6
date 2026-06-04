@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { X, ClipboardList } from 'lucide-react';
 import {
@@ -10,7 +9,7 @@ import {
 } from '@dentaflow/shared';
 import { odontogramApi } from '@/api';
 import { formatDateTime } from '@/lib/utils';
-import { InteractiveTooth3D } from './InteractiveTooth3D';
+import { ToothDiagram } from './ToothDiagram';
 import { SURFACE_LABELS, SURFACE_SHORT } from './odontogram.constants';
 
 interface Props {
@@ -30,7 +29,6 @@ export function Tooth3DPanel({
   onSurfaceChange,
   onClose,
 }: Props) {
-  const [hoveredSurface, setHoveredSurface] = useState<ToothSurface | null>(null);
   const record = odontogram[toothNumber];
 
   const { data: interventions, isLoading: loadingInterventions } = useQuery({
@@ -38,6 +36,10 @@ export function Tooth3DPanel({
     queryFn: () =>
       odontogramApi.toothHistory(patientId, toothNumber).then((r) => r.data),
   });
+
+  const filteredInterventions = selectedSurface
+    ? interventions?.filter((rec: { surface?: string }) => rec.surface === selectedSurface)
+    : interventions;
 
   return (
     <div className="flex flex-col">
@@ -73,35 +75,44 @@ export function Tooth3DPanel({
         </div>
       </div>
 
-      <InteractiveTooth3D
-        toothNumber={toothNumber}
-        record={record}
-        hoveredSurface={hoveredSurface}
-        selectedSurface={selectedSurface}
-        onSurfaceClick={onSurfaceChange}
-        onSurfaceHover={setHoveredSurface}
-      />
+      <div className="flex flex-col items-center rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 via-white to-teal-50/30 py-6 px-4">
+        <ToothDiagram
+          record={record}
+          isSelected
+          selectedSurface={selectedSurface}
+          size="lg"
+          onToothClick={() => onSurfaceChange(null)}
+          onSurfaceSelect={onSurfaceChange}
+        />
+        <p className="text-xs text-slate-500 text-center mt-3 leading-relaxed">
+          Clic en una cara para ver el historial y registrar prestaciones
+        </p>
+      </div>
 
-      <p className="text-sm text-slate-500 text-center mt-2 mb-3">
-        Clic en una cara · el formulario está debajo del odontograma
-      </p>
-
-      <div className="border-t border-slate-300 pt-3">
+      <div className="border-t border-slate-300 pt-3 mt-3">
         <div className="flex items-center gap-2 mb-2">
           <ClipboardList size={14} className="text-teal-800" />
-          <span className="font-medium text-sm text-slate-800">Historial del diente</span>
+          <span className="font-medium text-sm text-slate-800">
+            {selectedSurface
+              ? `Historial · cara ${SURFACE_SHORT[selectedSurface]}`
+              : 'Historial del diente'}
+          </span>
         </div>
         <div className="divide-y divide-slate-200 overflow-y-auto max-h-48 border border-slate-300 rounded-lg bg-slate-50">
           {loadingInterventions ? (
             <div className="p-6 flex justify-center">
               <div className="w-6 h-6 border-2 border-teal-800 border-t-transparent rounded-full animate-spin" />
             </div>
-          ) : !interventions || interventions.length === 0 ? (
+          ) : !filteredInterventions || filteredInterventions.length === 0 ? (
             <div className="empty-state py-6">
-              <p className="empty-state-text">Sin intervenciones registradas.</p>
+              <p className="empty-state-text">
+                {selectedSurface
+                  ? 'Sin intervenciones en esta cara.'
+                  : 'Sin intervenciones registradas.'}
+              </p>
             </div>
           ) : (
-            interventions.map(
+            filteredInterventions.map(
               (rec: {
                 id: string;
                 status: ToothStatus;

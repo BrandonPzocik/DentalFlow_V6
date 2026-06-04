@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -7,11 +7,8 @@ import {
 } from 'lucide-react';
 import { patientsApi, odontogramApi, appointmentsApi, settingsApi } from '@/api';
 import { OdontogramView, type ToothSelection } from '@/components/odontogram/OdontogramView';
+import { Tooth3DPanel } from '@/components/odontogram/Tooth3DPanel';
 import { ToothTreatmentPanel } from '@/components/odontogram/ToothTreatmentPanel';
-
-const Tooth3DPanel = lazy(() =>
-  import('@/components/odontogram/Tooth3DPanel').then((m) => ({ default: m.Tooth3DPanel })),
-);
 import { EditPatientModal } from '@/components/patients/EditPatientModal';
 import { StudiesPanel } from '@/components/studies/StudiesPanel';
 import { PrescriptionsPanel } from '@/components/prescriptions/PrescriptionsPanel';
@@ -183,26 +180,6 @@ export function PatientDetailPage() {
 
       {/* ── ODONTOGRAM TAB ── */}
       {tab === 'Odontograma' && (
-        <div className="space-y-3">
-          {/* PDF button */}
-          <div className="flex justify-end">
-            <button
-              className="btn-secondary btn-sm"
-              onClick={() =>
-                odontogram &&
-                generateOdontogramPdf(
-                  patient,
-                  odontogram,
-                  (clinicSettings as any)['clinic_name'] ?? 'DentaFlow',
-                )
-              }
-              disabled={!odontogram}
-            >
-              📄 Descargar PDF
-            </button>
-          </div>
-
-          {/* Odontogram + vista 3D e intervenciones */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
             <div className="lg:col-span-7 space-y-4">
               {loadingOdonto ? (
@@ -215,6 +192,21 @@ export function PatientDetailPage() {
                     odontogram={odontogram}
                     selection={toothSelection}
                     onSelect={setToothSelection}
+                    headerAction={
+                      <button
+                        type="button"
+                        className="btn-secondary btn-sm shrink-0"
+                        onClick={() =>
+                          generateOdontogramPdf(
+                            patient,
+                            odontogram,
+                            (clinicSettings as Record<string, string>)['clinic_name'] ?? 'DentaFlow',
+                          )
+                        }
+                      >
+                        📄 Descargar PDF
+                      </button>
+                    }
                   />
                   {toothSelection && (
                     <ToothTreatmentPanel
@@ -234,28 +226,19 @@ export function PatientDetailPage() {
             <div className="lg:col-span-5">
               {toothSelection && odontogram ? (
                 <div className="panel p-4 lg:sticky lg:top-4">
-                  <Suspense
-                    fallback={
-                      <div className="flex flex-col items-center justify-center py-16 gap-3">
-                        <div className="w-8 h-8 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
-                        <p className="text-xs text-slate-400">Cargando visor 3D…</p>
-                      </div>
+                  <Tooth3DPanel
+                    toothNumber={toothSelection.toothNumber}
+                    patientId={id!}
+                    odontogram={odontogram}
+                    selectedSurface={toothSelection.surface}
+                    onSurfaceChange={(surface) =>
+                      setToothSelection({
+                        toothNumber: toothSelection.toothNumber,
+                        surface,
+                      })
                     }
-                  >
-                    <Tooth3DPanel
-                      toothNumber={toothSelection.toothNumber}
-                      patientId={id!}
-                      odontogram={odontogram}
-                      selectedSurface={toothSelection.surface}
-                      onSurfaceChange={(surface) =>
-                        setToothSelection({
-                          toothNumber: toothSelection.toothNumber,
-                          surface,
-                        })
-                      }
-                      onClose={() => setToothSelection(null)}
-                    />
-                  </Suspense>
+                    onClose={() => setToothSelection(null)}
+                  />
                 </div>
               ) : (
                 <div className="panel p-6 text-center min-h-[12rem] flex flex-col items-center justify-center">
@@ -267,7 +250,6 @@ export function PatientDetailPage() {
               )}
             </div>
           </div>
-        </div>
       )}
 
       {/* ── TREATMENT PLANS TAB ── */}

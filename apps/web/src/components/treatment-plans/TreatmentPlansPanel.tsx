@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { treatmentPlansApi, settingsApi } from '@/api';
 import { Modal } from '@/components/ui/Modal';
-import { buildPaymentReceiptHtml, wrapForPrint } from '@/lib/clinicalDocuments';
+import { buildPaymentReceiptHtml, getLogoAbsoluteUrl, openPrintWindow } from '@/lib/clinicalDocuments';
 import { cn } from '@/lib/utils';
 import { InstallmentStatus, TreatmentPlanStatus } from '@dentaflow/shared';
 
@@ -101,19 +101,18 @@ export function TreatmentPlansPanel({ patientId, patient }: Props) {
   function printReceipt(plan: any, inst: any) {
     const paidCount = plan.installments.filter((i: any) => i.status === InstallmentStatus.PAID).length;
     const totalInstallments = plan.installments.filter((i: any) => i.number > 0).length;
+    const settings = clinicSettings as Record<string, string>;
     const html = buildPaymentReceiptHtml({
-      clinicName: (clinicSettings as any)['clinic_name'] ?? 'DentaFlow',
-      clinicAddress: (clinicSettings as any)['clinic_address'],
+      clinicName: settings['clinic_name'] ?? 'Mi consultorio',
+      clinicAddress: settings['clinic_address'],
+      logoUrl: settings['clinic_logo_url'] || getLogoAbsoluteUrl(),
       patient,
       plan,
       installment: inst,
       paidCount,
       totalInstallments,
     });
-    const win = window.open('', '_blank', 'width=640,height=720');
-    if (!win) return;
-    win.document.write(wrapForPrint(html));
-    win.document.close();
+    openPrintWindow(html, 640, 720);
   }
 
   const activePlans = (plans as any[]).filter((p) => p.status === TreatmentPlanStatus.ACTIVE);

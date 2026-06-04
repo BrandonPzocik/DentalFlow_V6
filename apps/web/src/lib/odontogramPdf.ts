@@ -2,6 +2,15 @@ import {
   TOOTH_STATUS_COLORS, TOOTH_STATUS_LABELS, ToothStatus, ToothSurface,
   Odontogram, UPPER_RIGHT, UPPER_LEFT, LOWER_LEFT, LOWER_RIGHT,
 } from '@dentaflow/shared';
+import {
+  BRAND,
+  buildDocumentFooter,
+  buildDocumentHeader,
+  documentBaseStyles,
+  documentPrintButton,
+  getLogoAbsoluteUrl,
+  openPrintWindow,
+} from './documentBrand';
 
 const SURFACE_LABELS: Record<ToothSurface, string> = {
   [ToothSurface.MESIAL]:     'Mesial',
@@ -91,7 +100,7 @@ function buildHistoryRows(odontogram: Odontogram): string {
   return rows.join('');
 }
 
-export function generateOdontogramPdf(patient: any, odontogram: Odontogram, clinicName = 'DentaFlow'): void {
+export function generateOdontogramPdf(patient: any, odontogram: Odontogram, clinicName = 'Mi consultorio'): void {
   const generated = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' });
   const age = (() => {
     const b = new Date(patient.dateOfBirth);
@@ -112,40 +121,27 @@ export function generateOdontogramPdf(patient: any, odontogram: Odontogram, clin
     </div>`
   ).join('');
 
+  const logoUrl = getLogoAbsoluteUrl();
+
   const html = `<!DOCTYPE html>
 <html lang="es"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Odontograma — ${patient.lastName}, ${patient.firstName}</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#334155;font-size:13px;line-height:1.5}
-@page{size:A4;margin:15mm 12mm}
-@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.no-print{display:none!important}}
-.print-btn{position:fixed;top:14px;right:14px;background:#0d9488;color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(13,148,136,.4)}
-.print-btn:hover{background:#0f766e}
-.section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#0d9488;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:8px}
+${documentBaseStyles()}
 .history-table{width:100%;border-collapse:collapse;font-size:12px}
-.history-table thead tr{background:#0d9488}
+.history-table thead tr{background:${BRAND.primaryDark}}
 .history-table thead th{padding:9px 10px;text-align:left;font-size:10px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.06em}
-.history-table tbody tr:nth-child(even){background:#f8fafc}
-.sign-box{border-top:1px solid #94a3b8;padding-top:5px;min-width:180px;text-align:center;font-size:10px}
+.history-table tbody tr:nth-child(even){background:${BRAND.surface}}
 </style></head><body>
-<button class="no-print print-btn" onclick="window.print()">🖨️ Imprimir / PDF</button>
+${documentPrintButton()}
 
-<!-- Header -->
-<div style="display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:16px;border-bottom:3px solid #0d9488;margin-bottom:20px">
-  <div style="display:flex;align-items:center;gap:12px">
-    <div style="width:42px;height:42px;background:#0d9488;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">🦷</div>
-    <div>
-      <div style="font-size:18px;font-weight:800;color:#0f172a;letter-spacing:-.02em">${clinicName}</div>
-      <div style="font-size:11px;color:#64748b">Sistema de Gestión Odontológica</div>
-    </div>
-  </div>
-  <div>
-    <div style="font-size:15px;font-weight:700;color:#0f766e">Odontograma Clínico</div>
-    <div style="font-size:11px;color:#94a3b8;text-align:right">Generado el ${generated}</div>
-  </div>
-</div>
+${buildDocumentHeader({
+  clinicName,
+  docTitle: 'Odontograma Clínico',
+  docMetaHtml: `<div style="font-size:11px;color:${BRAND.faint};margin-top:4px;text-align:right">Generado el ${generated}</div>`,
+  logoUrl,
+})}
 
 <!-- Patient info -->
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
@@ -174,12 +170,12 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#334155;font-
 
 <!-- Odontogram -->
 <div class="section-title">
-  <span style="background:#0d9488;color:white;border-radius:4px;padding:2px 7px;font-size:10px">FDI</span>
+  <span style="background:${BRAND.primaryDark};color:white;border-radius:4px;padding:2px 7px;font-size:10px">FDI</span>
   Odontograma — Dentición permanente
 </div>
-<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:16px">
+<div style="background:${BRAND.surface};border:1px solid ${BRAND.border};border-radius:12px;padding:16px;margin-bottom:14px">
   <table style="border-collapse:collapse;margin:0 auto">
-    <tr><td colspan="17" style="text-align:center;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#0d9488;font-weight:700;padding-bottom:6px">▲ Arcada superior</td></tr>
+    <tr><td colspan="17" style="text-align:center;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:${BRAND.primaryDark};font-weight:700;padding-bottom:6px">▲ Arcada superior</td></tr>
     <tr>
       ${buildRow(UPPER_RIGHT, odontogram)}
       <td style="padding:0 8px;vertical-align:middle"><div style="width:1px;height:40px;background:#e2e8f0"></div></td>
@@ -214,18 +210,12 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#334155;font-
   <tbody>${buildHistoryRows(odontogram)}</tbody>
 </table>
 
-<!-- Footer -->
-<div style="margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:flex-end;font-size:10px;color:#94a3b8">
-  <div>
-    <div><strong>${clinicName}</strong> — Sistema DentaFlow</div>
-    <div>Documento generado el ${generated} · Historia clínica electrónica</div>
-  </div>
-  <div class="sign-box">Firma y sello del profesional</div>
-</div>
+${buildDocumentFooter({
+  clinicName,
+  extraLine: `Documento generado el ${generated} · Historia clínica electrónica`,
+  showSignature: true,
+})}
 </body></html>`;
 
-  const win = window.open('', '_blank', 'width=900,height=750');
-  if (!win) { alert('Permitir ventanas emergentes para generar el PDF'); return; }
-  win.document.write(html);
-  win.document.close();
+  openPrintWindow(html);
 }

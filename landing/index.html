@@ -73,20 +73,11 @@
       gap: 10px;
       text-decoration: none;
     }
-    .nav-logo-icon {
-      width: 36px; height: 36px;
-      background: var(--teal);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-      box-shadow: 0 0 20px var(--teal-glow);
-    }
-    .nav-logo-text {
-      font-family: var(--font-display);
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--white);
-      letter-spacing: -.02em;
+    .nav-logo-img {
+      height: 40px;
+      width: auto;
+      object-fit: contain;
+      display: block;
     }
     .nav-links {
       display: flex;
@@ -360,14 +351,11 @@
       border-bottom: 1px solid rgba(255,255,255,.06);
       margin-bottom: 8px;
     }
-    .mock-logo-sq {
-      width: 28px; height: 28px;
-      background: var(--teal);
-      border-radius: 7px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px;
+    .mock-logo-img {
+      height: 28px;
+      width: auto;
+      object-fit: contain;
     }
-    .mock-logo-label { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: #fff; }
     .mock-nav-item {
       display: flex;
       align-items: center;
@@ -1015,9 +1003,8 @@
 
 <!-- NAV -->
 <nav>
-  <a href="#" class="nav-logo">
-    <div class="nav-logo-icon">🦷</div>
-    <span class="nav-logo-text">DentaFlow</span>
+  <a href="#" class="nav-logo" aria-label="DentalFlow">
+    <img src="dentalflow-logo.png" alt="DentalFlow" class="nav-logo-img" />
   </a>
   <ul class="nav-links">
     <li><a href="#funcionalidades">Funcionalidades</a></li>
@@ -1091,8 +1078,7 @@
         <!-- Sidebar -->
         <div class="mock-sidebar">
           <div class="mock-logo-row">
-            <div class="mock-logo-sq">🦷</div>
-            <span class="mock-logo-label">DentaFlow</span>
+            <img src="dentalflow-logo.png" alt="DentalFlow" class="mock-logo-img" />
           </div>
           <div class="mock-section-label">Principal</div>
           <div class="mock-nav-item active"><span class="mock-nav-icon">📊</span> Dashboard</div>
@@ -1524,7 +1510,7 @@
 <!-- FOOTER -->
 <footer>
   <div class="footer-copy">
-    © 2025 <strong style="color:var(--teal)">DentaFlow</strong> — Sistema de Gestión Odontológica. Hecho con 🦷 en Argentina.
+    © 2025 <strong style="color:var(--teal)">DentalFlow</strong> — Sistema de Gestión Odontológica. Hecho en Argentina.
   </div>
   <ul class="footer-links">
     <li><a href="#funcionalidades">Funcionalidades</a></li>

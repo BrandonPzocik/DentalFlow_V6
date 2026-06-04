@@ -4,6 +4,15 @@ import { X, FileText, Printer } from 'lucide-react';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { billingApi, socialWorksApi, settingsApi } from '@/api';
 import { Modal } from '@/components/ui/Modal';
+import {
+  BRAND,
+  buildDocumentFooter,
+  buildDocumentHeader,
+  documentBaseStyles,
+  documentPrintButton,
+  getLogoAbsoluteUrl,
+  openPrintWindow,
+} from '@/lib/documentBrand';
 
 interface Props { onClose: () => void; }
 
@@ -57,54 +66,15 @@ function buildPdfHtml(data: {
       </tr>`;
   }).join('');
 
+  const logoUrl = getLogoAbsoluteUrl();
+
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Liquidación ${sw?.name} — ${from} al ${to}</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: #fff;
-      color: #334155;
-      font-size: 13px;
-    }
-    @page {
-      size: A4;
-      margin: 18mm 15mm 18mm 15mm;
-    }
-    @media print {
-      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .no-print { display: none !important; }
-    }
-
-    /* ── HEADER ─── */
-    .header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      padding-bottom: 20px;
-      border-bottom: 3px solid #0d9488;
-      margin-bottom: 24px;
-    }
-    .logo-box {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .logo-icon {
-      width: 44px; height: 44px;
-      background: #0d9488;
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
-    }
-    .clinic-name { font-size: 18px; font-weight: 700; color: #1e293b; }
-    .clinic-sub  { font-size: 11px; color: #64748b; margin-top: 2px; }
-    .doc-info    { text-align: right; }
-    .doc-title   { font-size: 16px; font-weight: 700; color: #0f766e; margin-bottom: 4px; }
-    .doc-meta    { font-size: 11px; color: #64748b; line-height: 1.6; }
+    ${documentBaseStyles()}
 
     /* ── INFO PILLS ─── */
     .info-row {
@@ -114,20 +84,20 @@ function buildPdfHtml(data: {
       flex-wrap: wrap;
     }
     .pill {
-      background: #f0fdfa;
-      border: 1px solid #99f6e4;
+      background: #ecfeff;
+      border: 1px solid #a5f3fc;
       border-radius: 8px;
       padding: 10px 16px;
       flex: 1;
       min-width: 140px;
     }
     .pill-label { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: #64748b; margin-bottom: 3px; }
-    .pill-value { font-size: 14px; font-weight: 700; color: #0f766e; }
+    .pill-value { font-size: 14px; font-weight: 700; color: ${BRAND.primaryDark}; }
 
     /* ── TABLE ─── */
     table { width: 100%; border-collapse: collapse; }
     thead tr {
-      background: #0d9488;
+      background: ${BRAND.primaryDark};
     }
     thead th {
       padding: 10px 12px;
@@ -140,7 +110,7 @@ function buildPdfHtml(data: {
     }
     thead th:last-child { text-align: right; }
     tbody tr:nth-child(even) { background: #f8fafc; }
-    tbody tr:hover { background: #f0fdfa; }
+    tbody tr:hover { background: #ecfeff; }
 
     /* ── TOTALS ─── */
     .totals-box {
@@ -149,7 +119,7 @@ function buildPdfHtml(data: {
       justify-content: flex-end;
     }
     .totals-inner {
-      background: #0d9488;
+      background: ${BRAND.primaryDark};
       border-radius: 10px;
       padding: 14px 24px;
       min-width: 220px;
@@ -158,70 +128,22 @@ function buildPdfHtml(data: {
     .totals-amount { font-size: 22px; font-weight: 800; color: #fff; margin-top: 2px; }
     .totals-count  { font-size: 11px; color: rgba(255,255,255,.65); margin-top: 3px; }
 
-    /* ── FOOTER ─── */
-    .footer {
-      margin-top: 32px;
-      padding-top: 14px;
-      border-top: 1px solid #e2e8f0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 10px;
-      color: #94a3b8;
-    }
-    .signature-box {
-      border-top: 1px solid #94a3b8;
-      padding-top: 6px;
-      text-align: center;
-      min-width: 180px;
-      font-size: 10px;
-      color: #64748b;
-    }
-
-    /* ── PRINT BUTTON ─── */
-    .print-btn {
-      position: fixed;
-      top: 16px; right: 16px;
-      background: #0d9488;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 20px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 4px 12px rgba(13,148,136,.4);
-    }
-    .print-btn:hover { background: #0f766e; }
   </style>
 </head>
 <body>
 
-  <button class="no-print print-btn" onclick="window.print()">
-    🖨️ Imprimir / Guardar PDF
-  </button>
+  ${documentPrintButton()}
 
-  <!-- Header -->
-  <div class="header">
-    <div class="logo-box">
-      <div class="logo-icon">🦷</div>
-      <div>
-        <div class="clinic-name">${clinicName}</div>
-        <div class="clinic-sub">Sistema de Gestión Odontológica</div>
-      </div>
-    </div>
-    <div class="doc-info">
-      <div class="doc-title">Liquidación de Prestaciones</div>
-      <div class="doc-meta">
-        Obra Social: <strong>${sw?.name ?? ''}</strong><br>
-        Período: ${from} al ${to}<br>
-        Generado: ${generated}
-      </div>
-    </div>
-  </div>
+  ${buildDocumentHeader({
+    clinicName,
+    docTitle: 'Liquidación de Prestaciones',
+    docMetaHtml: `<div style="font-size:11px;color:${BRAND.muted};margin-top:4px;line-height:1.6;text-align:right">
+      Obra Social: <strong>${sw?.name ?? ''}</strong><br>
+      Período: ${from} al ${to}<br>
+      Generado: ${generated}
+    </div>`,
+    logoUrl,
+  })}
 
   <!-- Info pills -->
   <div class="info-row">
@@ -269,16 +191,7 @@ function buildPdfHtml(data: {
     </div>
   </div>
 
-  <!-- Footer -->
-  <div class="footer">
-    <div>
-      <div>DentaFlow — Sistema de Gestión Odontológica</div>
-      <div>Documento generado el ${generated}</div>
-    </div>
-    <div class="signature-box">
-      Firma y sello del profesional
-    </div>
-  </div>
+  ${buildDocumentFooter({ clinicName, extraLine: `Liquidación obra social · ${generated}`, showSignature: true })}
 
 </body>
 </html>`;
@@ -307,7 +220,7 @@ export function LiquidationModal({ onClose }: Props) {
 
   const sw    = (socialWorks as any[]).find((s: any) => s.id === swId);
   const total = (liquidation as any[])?.reduce((s: number, inv: any) => s + Number(inv.total), 0) ?? 0;
-  const clinicName = (clinicSettings as any)['clinic_name'] ?? 'DentaFlow';
+  const clinicName = (clinicSettings as any)['clinic_name'] ?? 'Mi consultorio';
 
   function handleDownloadPdf() {
     const html = buildPdfHtml({
@@ -319,10 +232,7 @@ export function LiquidationModal({ onClose }: Props) {
       clinicName,
     });
 
-    const win = window.open('', '_blank', 'width=900,height=700');
-    if (!win) { alert('Permitir ventanas emergentes para generar el PDF'); return; }
-    win.document.write(html);
-    win.document.close();
+    openPrintWindow(html, 900, 700);
   }
 
   return (

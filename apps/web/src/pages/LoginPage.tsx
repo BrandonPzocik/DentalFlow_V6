@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth.store';
 import { authApi } from '@/api';
+import { BrandLogo } from '@/components/brand/BrandLogo';
+import { BRAND } from '@/lib/documentBrand';
 
 export function LoginPage() {
   const [email, setEmail] = useState('admin@dentaflow.com');
@@ -34,13 +36,8 @@ export function LoginPage() {
       <div className="relative w-full max-w-md">
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
           <div className="flex flex-col items-center mb-8">
-            <div className="w-14 h-14 bg-teal-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-teal-600/30">
-              <svg viewBox="0 0 24 24" className="w-8 h-8 fill-white">
-                <path d="M12 2C9 2 7 4 7 6c0 1.5.5 2.5.5 4C7.5 12 6 13.5 6 16c0 2.5 1.5 4 3 4 .8 0 1.5-.5 2-.5s1.2.5 2 .5c1.5 0 3-1.5 3-4 0-2.5-1.5-4-1.5-6 0-1.5.5-2.5.5-4 0-2-2-4-5-4z"/>
-              </svg>
-            </div>
-            <h1 className="text-3xl font-medium text-white">DentaFlow</h1>
-            <p className="text-slate-400 text-base mt-1">Sistema de gestión odontológica</p>
+            <BrandLogo showText={false} size="lg" className="justify-center mb-3" imgClassName="h-16" />
+            <p className="text-slate-400 text-base text-center">{BRAND.tagline}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -91,7 +88,7 @@ export function LoginPage() {
           </form>
 
           <p className="text-center text-slate-500 text-xs mt-6">
-            DentaFlow v1.0 — Uso exclusivo del personal autorizado
+            {BRAND.name} v1.0 — Uso exclusivo del personal autorizado
           </p>
         </div>
       </div>

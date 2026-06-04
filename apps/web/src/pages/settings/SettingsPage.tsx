@@ -127,8 +127,8 @@ export function SettingsPage() {
           <SettingRow label="Email del consultorio" description="Se usa como remitente en emails">
             <input type="email" className="input" value={settings['clinic_email'] ?? ''} onChange={(e) => set('clinic_email', e.target.value)} />
           </SettingRow>
-          <SettingRow label="URL del logo" description="HTTPS — se muestra en emails enviados">
-            <input className="input" value={settings['clinic_logo_url'] ?? ''} onChange={(e) => set('clinic_logo_url', e.target.value)} placeholder="https://…" />
+          <SettingRow label="URL del logo" description="Opcional. Si está vacío, se usa el logo DentalFlow en recetas, presupuestos, odontograma y facturas">
+            <input className="input" value={settings['clinic_logo_url'] ?? ''} onChange={(e) => set('clinic_logo_url', e.target.value)} placeholder="https://… (dejar vacío = logo DentalFlow)" />
           </SettingRow>
           <SettingRow label="Moneda" description="Usada en facturas y reportes">
             <select className="input" value={settings['currency'] ?? 'ARS'} onChange={(e) => set('currency', e.target.value)}>

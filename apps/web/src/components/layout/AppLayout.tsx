@@ -6,6 +6,8 @@ import {
 import { useAuthStore } from '@/store/auth.store';
 import { Toaster } from 'sonner';
 import { cn } from '@/lib/utils';
+import { BrandLogo } from '@/components/brand/BrandLogo';
+import { BRAND } from '@/lib/documentBrand';
 
 const NAV_SECTIONS = [
   {
@@ -45,7 +47,7 @@ const ROUTE_CRUMBS: Record<string, string> = {
 function useBreadcrumb() {
   const { pathname } = useLocation();
   const parts = pathname.split('/').filter(Boolean);
-  const crumbs: { label: string; to?: string }[] = [{ label: 'DentaFlow', to: '/dashboard' }];
+  const crumbs: { label: string; to?: string }[] = [{ label: BRAND.name, to: '/dashboard' }];
   let path = '';
   for (const part of parts) {
     path += `/${part}`;
@@ -71,16 +73,8 @@ export function AppLayout() {
         className="flex flex-col bg-slate-900 shrink-0 border-r border-slate-800"
         style={{ width: 'var(--sidebar-width)' }}
       >
-        <div className="flex items-center gap-3 px-4 border-b border-slate-800" style={{ height: 'var(--topbar-height)' }}>
-          <div className="w-10 h-10 bg-teal-700 rounded-xl flex items-center justify-center shrink-0">
-            <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white" aria-hidden>
-              <path d="M12 2C9 2 7 4 7 6c0 1.5.5 2.5.5 4C7.5 12 6 13.5 6 16c0 2.5 1.5 4 3 4 .8 0 1.5-.5 2-.5s1.2.5 2 .5c1.5 0 3-1.5 3-4 0-2.5-1.5-4-1.5-6 0-1.5.5-2.5.5-4 0-2-2-4-5-4z" />
-            </svg>
-          </div>
-          <div className="min-w-0">
-            <p className="text-white text-base font-medium leading-tight truncate">DentaFlow</p>
-            <p className="text-slate-500 text-sm truncate">Gestión odontológica</p>
-          </div>
+        <div className="px-4 border-b border-slate-800 flex items-center" style={{ height: 'var(--topbar-height)' }}>
+          <BrandLogo variant="light" size="md" showText={false} imgClassName="h-9" />
         </div>
 
         <nav className="flex-1 px-2 py-4 space-y-6 overflow-y-auto">

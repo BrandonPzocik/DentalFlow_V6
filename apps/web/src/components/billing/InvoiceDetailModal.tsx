@@ -48,7 +48,13 @@ export function InvoiceDetailModal({ invoice, onClose, onUpdate }: Props) {
       if (patient.acceptsEmail === false) throw new Error('El paciente no acepta comunicaciones por email');
       const clinicName = (clinicSettings as Record<string, string>)['clinic_name'] ?? 'DentaFlow';
       const clinicAddress = (clinicSettings as Record<string, string>)['clinic_address'] ?? '';
-      const html = buildInvoiceHtml({ invoice, clinicName, clinicAddress });
+      const logoUrl = (clinicSettings as Record<string, string>)['clinic_logo_url'];
+      const html = buildInvoiceHtml({
+        invoice,
+        clinicName,
+        clinicAddress,
+        logoUrl: logoUrl || undefined,
+      });
       return notificationsApi.sendDocument({
         patientId: patient.id,
         subject: `Comprobante ${invoice.number} — ${patient.lastName}, ${patient.firstName}`,

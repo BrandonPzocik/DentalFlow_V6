@@ -10,7 +10,7 @@ import { useAuthStore } from '@/store/auth.store';
 import { cn } from '@/lib/utils';
 import {
   buildPrescriptionDocumentHtml,
-  wrapForPrint,
+  openPrintWindow,
 } from '@/lib/clinicalDocuments';
 
 const COMMON_DRUGS = [
@@ -129,10 +129,7 @@ export function PrescriptionsPanel({ patientId, patient }: { patientId: string; 
   }
 
   function printPrescription(p: any) {
-    const win = window.open('', '_blank', 'width=860,height=720');
-    if (!win) return;
-    win.document.write(wrapForPrint(documentHtml(p)));
-    win.document.close();
+    openPrintWindow(documentHtml(p), 860, 720);
   }
 
   async function emailPrescription(p: any) {

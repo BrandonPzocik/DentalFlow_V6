@@ -60,7 +60,7 @@ export function buildDocumentHeader(opts: DocumentHeaderOptions): string {
   return `
 <div style="display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:14px;border-bottom:3px solid ${BRAND.primary};margin-bottom:18px;gap:16px">
   <div style="display:flex;align-items:center;gap:14px;min-width:0;flex:1">
-    <img src="${logo}" alt="${BRAND.name}" style="height:46px;width:auto;max-width:200px;object-fit:contain;flex-shrink:0" />
+    <img src="${logo}" alt="${BRAND.name}" style="height:56px;width:auto;max-width:280px;object-fit:contain;flex-shrink:0;display:block" />
     <div style="min-width:0">
       <div style="font-size:17px;font-weight:800;color:${BRAND.navy};letter-spacing:-.02em;line-height:1.2">${opts.clinicName}</div>
       ${address}

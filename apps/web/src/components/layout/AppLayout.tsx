@@ -73,8 +73,10 @@ export function AppLayout() {
         className="flex flex-col bg-slate-900 shrink-0 border-r border-slate-800"
         style={{ width: 'var(--sidebar-width)' }}
       >
-        <div className="px-4 border-b border-slate-800 flex items-center" style={{ height: 'var(--topbar-height)' }}>
-          <BrandLogo variant="light" size="md" showText={false} imgClassName="h-9" />
+        <div
+          className="px-3 py-3 border-b border-slate-800 flex items-center justify-center min-h-[4.5rem]"
+        >
+          <BrandLogo surface="dark" size="sidebar" showText={false} className="w-full" />
         </div>
 
         <nav className="flex-1 px-2 py-4 space-y-6 overflow-y-auto">

@@ -36,7 +36,7 @@ export function LoginPage() {
       <div className="relative w-full max-w-md">
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
           <div className="flex flex-col items-center mb-8">
-            <BrandLogo showText={false} size="lg" className="justify-center mb-3" imgClassName="h-16" />
+            <BrandLogo surface="dark" showText={false} size="xl" className="justify-center mb-4 w-full" />
             <p className="text-slate-400 text-base text-center">{BRAND.tagline}</p>
           </div>
 

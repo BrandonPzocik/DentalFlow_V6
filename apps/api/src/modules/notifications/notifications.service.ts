@@ -8,6 +8,7 @@ import {
   NotificationType, NotificationStatus,
 } from './notification-log.entity';
 import { Patient } from '../patients/patient.entity';
+import { CLINIC_TIMEZONE, formatClinicTime } from '../../common/clinic-timezone';
 
 export interface SendEmailResult {
   ok: boolean;
@@ -176,10 +177,9 @@ export class NotificationsService {
 
     const dateStr = new Intl.DateTimeFormat('es-AR', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+      timeZone: CLINIC_TIMEZONE,
     }).format(data.scheduledAt);
-    const timeStr = data.scheduledAt.toLocaleTimeString('es-AR', {
-      hour: '2-digit', minute: '2-digit',
-    });
+    const timeStr = formatClinicTime(data.scheduledAt);
     const treatment = data.treatmentType ?? 'Consulta odontológica';
     const clinicName = this.config.get('CLINIC_NAME', 'DentaFlow');
 
@@ -209,10 +209,9 @@ export class NotificationsService {
 
     const dateStr = new Intl.DateTimeFormat('es-AR', {
       weekday: 'long', day: 'numeric', month: 'long',
+      timeZone: CLINIC_TIMEZONE,
     }).format(data.scheduledAt);
-    const timeStr = data.scheduledAt.toLocaleTimeString('es-AR', {
-      hour: '2-digit', minute: '2-digit',
-    });
+    const timeStr = formatClinicTime(data.scheduledAt);
     const treatment = data.treatmentType ?? 'Consulta odontológica';
     const clinicName = this.config.get('CLINIC_NAME', 'DentaFlow');
 
@@ -279,10 +278,9 @@ export class NotificationsService {
 
     const dateStr = new Intl.DateTimeFormat('es-AR', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+      timeZone: CLINIC_TIMEZONE,
     }).format(data.scheduledAt);
-    const timeStr = data.scheduledAt.toLocaleTimeString('es-AR', {
-      hour: '2-digit', minute: '2-digit',
-    });
+    const timeStr = formatClinicTime(data.scheduledAt);
     const treatment = data.treatmentType ?? 'Consulta odontológica';
     const clinicName = this.config.get('CLINIC_NAME', 'DentaFlow');
     const confirmUrl = `${data.baseUrl}/api/appointments/confirm/${data.confirmationToken}`;
@@ -315,10 +313,9 @@ export class NotificationsService {
 
     const dateStr = new Intl.DateTimeFormat('es-AR', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+      timeZone: CLINIC_TIMEZONE,
     }).format(data.scheduledAt);
-    const timeStr = data.scheduledAt.toLocaleTimeString('es-AR', {
-      hour: '2-digit', minute: '2-digit',
-    });
+    const timeStr = formatClinicTime(data.scheduledAt);
     const clinicName = this.config.get('CLINIC_NAME', 'DentaFlow');
 
     return this.sendEmail({

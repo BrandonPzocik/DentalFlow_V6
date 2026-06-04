@@ -1,3 +1,8 @@
+import { CLINIC_TIMEZONE } from './common/clinic-timezone';
+
+// Turnos y mensajes deben mostrarse en hora local del consultorio, no en UTC del servidor.
+process.env.TZ = process.env.TZ ?? CLINIC_TIMEZONE;
+
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,

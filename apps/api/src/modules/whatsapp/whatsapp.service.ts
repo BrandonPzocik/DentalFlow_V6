@@ -18,6 +18,7 @@ import { SettingsService } from '../settings/settings.service';
 import { WhatsappContentService } from './whatsapp-content.service';
 import { Patient } from '../patients/patient.entity';
 import { Appointment } from '../appointments/appointment.entity';
+import { formatClinicDateTime } from '../../common/clinic-timezone';
 
 export interface SendWhatsappResult {
   ok: boolean;
@@ -85,18 +86,7 @@ export class WhatsappService {
   }
 
   formatAppointmentDate(scheduledAt: Date): { date: string; time: string } {
-    return {
-      date: scheduledAt.toLocaleDateString('es-AR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      }),
-      time: scheduledAt.toLocaleTimeString('es-AR', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      }),
-    };
+    return formatClinicDateTime(scheduledAt);
   }
 
   buildCreationMessage(patient: Patient, apt: Appointment): string {

@@ -10,6 +10,7 @@ import { AppointmentStatus } from '@dentaflow/shared';
 import { NotificationsService } from '../notifications/notifications.service';
 import { PatientsService } from '../patients/patients.service';
 import { WhatsappService } from '../whatsapp/whatsapp.service';
+import { formatClinicTime } from '../../common/clinic-timezone';
 
 @Injectable()
 export class AppointmentsService {
@@ -269,7 +270,7 @@ export class AppointmentsService {
 
     if (conflict) {
       throw new BadRequestException(
-        `Conflicto de horario: ya hay un turno a las ${new Date(conflict.scheduledAt).toLocaleTimeString('es-AR')}`,
+        `Conflicto de horario: ya hay un turno a las ${formatClinicTime(new Date(conflict.scheduledAt))}`,
       );
     }
   }
